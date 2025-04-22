@@ -33,7 +33,7 @@
   </div>
 
   <script>
-    fetch('https://docusignapi.netlify.app/.netlify/functions/getUserInfo')
+    fetch('https://docusign-portal.netlify.app/.netlify/functions/getUserInfo')
       .then(res => res.json())
       .then(data => {
         const acc = data.accounts[0];
