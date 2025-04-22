@@ -162,7 +162,7 @@ th.sorting.sorting_asc {
           const updated = item.statusChangedDateTime ? new Date(item.statusChangedDateTime).toLocaleString() : '—';
           const envelopeId = item.envelopeId || '—';
 
-          const fetchRecipientData = fetch(`https://docusignapi.netlify.app/.netlify/functions/getRecipients?id=${envelopeId}`)
+          const fetchRecipientData = fetch(`https://docusign-portal.netlify.app/.netlify/functions/getRecipients?id=${envelopeId}`)
             .then(res => res.json())
             .then(recipientData => {
               const nextSigner = recipientData.signers?.find(signer => signer.status !== "completed")?.name || '—';
