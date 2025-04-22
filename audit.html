@@ -67,7 +67,7 @@
       const urlParams = new URLSearchParams(window.location.search);
       const envelopeId = urlParams.get('id');
 
-      fetch(`https://docusignapi.netlify.app/.netlify/functions/audit?id=${envelopeId}`)
+      fetch(`https://docusign-portal.netlify.app/.netlify/functions/audit?id=${envelopeId}`)
         .then(response => response.json())
         .then(data => {
           const events = data;
