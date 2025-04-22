@@ -22,7 +22,7 @@
     if (!envelopeId) {
       document.getElementById('envelopeDetails').innerHTML = '<p class="text-red-600 text-center text-lg">Envelope ID is required.</p>';
     } else {
-      fetch(`https://docusignapi.netlify.app/.netlify/functions/viewEnvelope?id=${envelopeId}`)
+      fetch(`https://docusign-portal.netlify.app/.netlify/functions/viewEnvelope?id=${envelopeId}`)
         .then(res => res.json())
         .then(data => {
           if (data.envelopeId) {
