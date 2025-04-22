@@ -178,7 +178,7 @@ th.sorting.sorting_asc {
               };
 
               const badgeClass = badgeColors[status] || 'bg-gray-200 text-gray-700';
-              const statusBadge = `<span class="px-2 py-1 rounded-full text-sm font-semibold ${badgeClass}">${status}</span>`;
+              const statusBadge = `<span class="capitalize px-2 py-1 rounded-full text-sm font-semibold ${badgeClass}">${status}</span>`;
               const viewLink = `<a href="/viewEnvelope.html?id=${envelopeId}" class="btn btn-sm bluebtn">View</a>`;
               const auditLink = `<a href="/audit.html?id=${envelopeId}" class="btn btn-sm btn-orange">Audit Logs</a>`;
 
