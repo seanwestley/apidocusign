@@ -93,7 +93,7 @@
       document.getElementById('recipient-table-body').innerHTML = '';
       document.getElementById('statusGrid').innerHTML = '';
 
-      fetch(`https://docusignapi.netlify.app/.netlify/functions/getRecipients?id=${envelopeId}`)
+      fetch(`https://docusign-portal.netlify.app/.netlify/functions/getRecipients?id=${envelopeId}`)
         .then(res => res.json())
         .then(data => {
           const recipients = data.signers || [];
