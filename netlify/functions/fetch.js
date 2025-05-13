@@ -6,7 +6,7 @@ exports.handler = async function (event, context) {
     // Your DocuSign Integration Info
     const integratorKey = process.env.DS_CLIENT_ID;
     const userId = process.env.DS_USER_ID; // GUID format
-    const authServer = 'account-d.docusign.com';
+    const authServer = 'account.docusign.com';
     const privateKey = process.env.DS_PRIVATE_KEY.replace(/\\n/g, '\n');
     console.log('Private Key:', privateKey);
 
