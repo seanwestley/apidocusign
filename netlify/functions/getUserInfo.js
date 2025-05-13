@@ -5,7 +5,7 @@ exports.handler = async function (event, context) {
   try {
     const integratorKey = process.env.DS_CLIENT_ID;
     const userId = process.env.DS_USER_ID;
-    const authServer = 'account-d.docusign.com';
+    const authServer = 'account.docusign.com';
     const privateKey = process.env.DS_PRIVATE_KEY.replace(/\\n/g, '\n');
 
     const dsApi = new docusign.ApiClient();
