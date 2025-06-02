@@ -154,7 +154,7 @@ th.sorting.sorting_asc {
         const statusCounts = {};
         const fetchPromises = [];
 
-        data.forEach(item => {
+data.filter(item => item.emailSubject?.toLowerCase().includes('sonora')).forEach(item => {
         const usernameofsender = item.sender.username || '-';
         console.log(usernameofsender);
           const subject = item.emailSubject || '—';
