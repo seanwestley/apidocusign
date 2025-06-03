@@ -209,6 +209,7 @@ data.filter(item => item.emailSubject?.toLowerCase().includes('sonora')).forEach
           initializeCharts(statusCounts);
           $('#envelopes').DataTable({
   autoWidth: false,
+  order: [[2, 'desc']], // 🔥 Sort by the "Updated" column (index 2) descending
   columnDefs: [
     { targets: 0, width: '35%' }, // KPC Envelope - give it more space
     { targets: 1, width: '10%' }, // Status
