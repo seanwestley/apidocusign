@@ -132,6 +132,7 @@ th.sorting.sorting_asc {
           <thead>
             <tr>
               <th>Sonora Investment Management</th>
+              <th>Invested Amount</th>
               <th>Status</th>
               <th>Updated</th>
               <th>Next Signer</th>
@@ -146,153 +147,163 @@ th.sorting.sorting_asc {
   </div>
 
   <!-- Scripts -->
-  <script>
-    fetch('https://docusign-portal.netlify.app/.netlify/functions/fetch')
-      .then(res => res.json())
-      .then(data => {
-        const tbody = document.querySelector('#envelopes tbody');
-        const statusCounts = {};
-        const fetchPromises = [];
+<script>
+  fetch('https://docusign-portal.netlify.app/.netlify/functions/fetch')
+    .then(res => res.json())
+    .then(data => {
+      const tbody = document.querySelector('#envelopes tbody');
+      const statusCounts = {};
+      const fetchPromises = [];
 
-data.filter(item => item.emailSubject?.toLowerCase().includes('sonora')).forEach(item => {
-        const usernameofsender = item.sender.username || '-';
-        console.log(usernameofsender);
+      data
+        .filter(item => item.emailSubject?.toLowerCase().includes('sonora'))
+        .forEach(item => {
           const subject = item.emailSubject || '—';
           const status = item.status || '—';
           const updated = item.statusChangedDateTime ? new Date(item.statusChangedDateTime).toLocaleString() : '—';
           const envelopeId = item.envelopeId || '—';
 
-          const fetchRecipientData = fetch(`https://docusign-portal.netlify.app/.netlify/functions/getRecipients?id=${envelopeId}`)
-            .then(res => res.json())
-            .then(recipientData => {
-              const nextSigner = recipientData.signers?.find(signer => signer.status !== "completed")?.name || '—';
+          const fetchRecipientAndAmount = Promise.all([
+            fetch(`https://docusign-portal.netlify.app/.netlify/functions/getRecipients?id=${envelopeId}`).then(res => res.json()),
+            fetch(`https://docusign-portal.netlify.app/.netlify/functions/fetchfields?id=${envelopeId}`)
+              .then(res => res.json())
+              .then(tabData => {
+                const investTab = tabData.numberTabs?.find(tab => tab.tabLabel === 'INVEST AMOUNT' && tab.documentId === "1");
+                return investTab?.value || '—';
+              })
+              .catch(() => '—')
+          ])
+          .then(([recipientData, investedAmount]) => {
+            const nextSigner = recipientData.signers?.find(signer => signer.status !== "completed")?.name || '—';
+            statusCounts[status] = (statusCounts[status] || 0) + 1;
 
-              statusCounts[status] = (statusCounts[status] || 0) + 1;
+            const badgeColors = {
+              completed: 'bg-green-100 text-[#5cb85c]',
+              'In Progress': 'bg-yellow-100 text-[#f0ad4e]',
+              voided: 'bg-gray-100 text-[#6e6e6e]',
+              deleted: 'bg-red-100 text-[#d9534f]',
+              status: 'bg-orange-100 text-[#f47c3c]'
+            };
 
-              const badgeColors = {
-                completed: 'bg-green-100 text-[#5cb85c]',
-                'In Progress': 'bg-yellow-100 text-[#f0ad4e]',
-                voided: 'bg-gray-100 text-[#6e6e6e]',
-                deleted: 'bg-red-100 text-[#d9534f]',
-                status: 'bg-orange-100 text-[#f47c3c]'
-              };
+            const badgeClass = badgeColors[status] || 'bg-gray-200 text-gray-700';
+            const statusBadge = `<span class="capitalize px-2 py-1 rounded-full text-sm font-semibold ${badgeClass}">${status}</span>`;
+            const viewLink = `<a href="/viewEnvelope.html?id=${envelopeId}" class="btn btn-sm bluebtn">View</a>`;
+            const auditLink = `<a href="/audit.html?id=${envelopeId}" class="btn btn-sm btn-orange">Audit Logs</a>`;
 
-              const badgeClass = badgeColors[status] || 'bg-gray-200 text-gray-700';
-              const statusBadge = `<span class="capitalize px-2 py-1 rounded-full text-sm font-semibold ${badgeClass}">${status}</span>`;
-              const viewLink = `<a href="/viewEnvelope.html?id=${envelopeId}" class="btn btn-sm bluebtn">View</a>`;
-              const auditLink = `<a href="/audit.html?id=${envelopeId}" class="btn btn-sm btn-orange">Audit Logs</a>`;
+            tbody.insertAdjacentHTML('beforeend', `
+              <tr>
+                <td>${subject}</td>
+                <td>$${investedAmount}</td>
+                <td>${statusBadge}</td>
+                <td>${updated}</td>
+                <td>${nextSigner}</td>
+                <td>${viewLink}</td>
+                <td>${auditLink}</td>
+              </tr>
+            `);
+          })
+          .catch(err => {
+            console.error('Error fetching data:', err);
+            tbody.insertAdjacentHTML('beforeend', `
+              <tr>
+                <td colspan="7" class="text-center text-red-600">Error loading envelope data</td>
+              </tr>
+            `);
+          });
 
-              tbody.insertAdjacentHTML('beforeend', `
-                <tr>
-                  <td>${subject}</td>
-                  <td>${statusBadge}</td>
-                  <td>${updated}</td>
-                  <td>${nextSigner}</td>
-                  <td>${viewLink}</td>
-                  <td>${auditLink}</td>
-                </tr>
-              `);
-            })
-            .catch(err => {
-              console.error('Error fetching recipients data:', err);
-              tbody.insertAdjacentHTML('beforeend', `
-                <tr>
-                  <td colspan="6" class="text-center text-red-600">Error loading next signer data</td>
-                </tr>
-              `);
-            });
-
-          fetchPromises.push(fetchRecipientData);
+          fetchPromises.push(fetchRecipientAndAmount);
         });
 
-        Promise.all(fetchPromises).then(() => {
-          initializeCharts(statusCounts);
-          $('#envelopes').DataTable({
-  autoWidth: false,
-  order: [[2, 'desc']], // 🔥 Sort by the "Updated" column (index 2) descending
-  columnDefs: [
-    { targets: 0, width: '35%' }, // KPC Envelope - give it more space
-    { targets: 1, width: '10%' }, // Status
-    { targets: 2, width: '15%' }, // Updated
-    { targets: 3, width: '20%' }, // Next Signer
-    { targets: 4, width: '5%' },  // View - tighten
-    { targets: 5, width: '10%' }   // Logs - tighten
-  ]
-});
-
-          updateStatusGrid(statusCounts);
-          document.getElementById('skeleton').style.display = 'none';
-          const dash = document.getElementById('dashboard');
-          dash.classList.remove('hidden');
-          dash.classList.add('animate-fade-in');
-        }).catch(err => {
-          document.body.innerHTML += `<p class="text-red-600 mt-4">Error loading all data: ${err.message}</p>`;
+      Promise.all(fetchPromises).then(() => {
+        initializeCharts(statusCounts);
+        $('#envelopes').DataTable({
+          autoWidth: false,
+          order: [[3, 'desc']], // Updated column index for "Updated"
+          columnDefs: [
+            { targets: 0, width: '30%' }, // Subject
+            { targets: 1, width: '10%' }, // Invested Amount
+            { targets: 2, width: '10%' }, // Status
+            { targets: 3, width: '15%' }, // Updated
+            { targets: 4, width: '15%' }, // Next Signer
+            { targets: 5, width: '10%' }, // View
+            { targets: 6, width: '10%' }  // Logs
+          ]
         });
-      })
-      .catch(err => {
-        document.body.innerHTML += `<p class="text-red-600 mt-4">Error loading data: ${err.message}</p>`;
+
+        updateStatusGrid(statusCounts);
+        document.getElementById('skeleton').style.display = 'none';
+        const dash = document.getElementById('dashboard');
+        dash.classList.remove('hidden');
+        dash.classList.add('animate-fade-in');
+      }).catch(err => {
+        document.body.innerHTML += `<p class="text-red-600 mt-4">Error loading all data: ${err.message}</p>`;
       });
+    })
+    .catch(err => {
+      document.body.innerHTML += `<p class="text-red-600 mt-4">Error loading data: ${err.message}</p>`;
+    });
 
-    function initializeCharts(statusCounts) {
-      const palette = {
-        completed: '#5cb85c',
-        'In Progress': '#f0ad4e',
-        voided: '#6e6e6e',
-        deleted: '#d9534f',
-        status: '#f47c3c',
-        default: '#1e4882'
-      };
+  function initializeCharts(statusCounts) {
+    const palette = {
+      completed: '#5cb85c',
+      'In Progress': '#f0ad4e',
+      voided: '#6e6e6e',
+      deleted: '#d9534f',
+      status: '#f47c3c',
+      default: '#1e4882'
+    };
 
-      new Chart(document.getElementById('statusPieChart'), {
-        type: 'pie',
-        data: {
-          labels: Object.keys(statusCounts),
-          datasets: [{
-            data: Object.values(statusCounts),
-            backgroundColor: Object.keys(statusCounts).map(status => palette[status] || palette.default)
-          }]
+    new Chart(document.getElementById('statusPieChart'), {
+      type: 'pie',
+      data: {
+        labels: Object.keys(statusCounts),
+        datasets: [{
+          data: Object.values(statusCounts),
+          backgroundColor: Object.keys(statusCounts).map(status => palette[status] || palette.default)
+        }]
+      },
+      options: {
+        plugins: {
+          legend: { position: 'bottom' },
+          title: { display: true, text: 'Envelope Status Distribution' }
+        }
+      }
+    });
+
+    new Chart(document.getElementById('statusBarChart'), {
+      type: 'bar',
+      data: {
+        labels: Object.keys(statusCounts),
+        datasets: [{
+          label: 'Envelope Count',
+          data: Object.values(statusCounts),
+          backgroundColor: Object.keys(statusCounts).map(status => palette[status] || palette.default)
+        }]
+      },
+      options: {
+        plugins: {
+          title: { display: true, text: 'Envelope Count by Status' }
         },
-        options: {
-          plugins: {
-            legend: { position: 'bottom' },
-            title: { display: true, text: 'Envelope Status Distribution' }
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { stepSize: 1 }
           }
         }
-      });
+      }
+    });
+  }
 
-      new Chart(document.getElementById('statusBarChart'), {
-        type: 'bar',
-        data: {
-          labels: Object.keys(statusCounts),
-          datasets: [{
-            label: 'Envelope Count',
-            data: Object.values(statusCounts),
-            backgroundColor: Object.keys(statusCounts).map(status => palette[status] || palette.default)
-          }]
-        },
-        options: {
-          plugins: {
-            title: { display: true, text: 'Envelope Count by Status' }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              ticks: { stepSize: 1 }
-            }
-          }
-        }
-      });
-    }
+  function updateStatusGrid(statusCounts) {
+    const grid = document.getElementById('statusGrid');
+    Object.entries(statusCounts).forEach(([status, count]) => {
+      const card = document.createElement('div');
+      card.className = "bg-[#1e4882] p-4 rounded-lg shadow text-center text-white font-semibold";
+      card.innerHTML = `<div class="text-sm">${status}</div><h1 class="text-2xl">${count}</h1>`;
+      grid.appendChild(card);
+    });
+  }
+</script>
 
-    function updateStatusGrid(statusCounts) {
-      const grid = document.getElementById('statusGrid');
-      Object.entries(statusCounts).forEach(([status, count]) => {
-        const card = document.createElement('div');
-        card.className = "bg-[#1e4882] p-4 rounded-lg shadow text-center text-white font-semibold";
-        card.innerHTML = `<div class="text-sm">${status}</div><h1 class="text-2xl">${count}</h1>`;
-        grid.appendChild(card);
-      });
-    }
-  </script>
 </body>
 </html>
