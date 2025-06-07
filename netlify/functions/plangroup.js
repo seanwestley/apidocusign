@@ -29,9 +29,9 @@ exports.handler = async function (event, context) {
     dsApi.addDefaultHeader('Authorization', 'Bearer ' + accessToken);
 
     const envelopesApi = new docusign.EnvelopesApi(dsApi);
-    const response = await envelopesApi.listStatusChanges(accountId, {
-      fromDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString(),
-    });
+ const response = await envelopesApi.listStatusChanges(accountId, {
+  fromDate: new Date('2024-05-24T00:00:00Z').toISOString(),
+});
 
     const sonoraEnvelopes = (response.envelopes || []).filter(envelope =>
       envelope.emailSubject?.toLowerCase().includes('plangroup')
