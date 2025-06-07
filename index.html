@@ -148,16 +148,14 @@ th.sorting.sorting_asc {
 
   <!-- Scripts -->
 <script>
-  fetch('https://docusign-portal.netlify.app/.netlify/functions/fetch')
+  fetch('https://docusign-portal.netlify.app/.netlify/functions/fetchsonora')
     .then(res => res.json())
     .then(data => {
       const tbody = document.querySelector('#envelopes tbody');
       const statusCounts = {};
       const fetchPromises = [];
 
-      data
-        .filter(item => item.emailSubject?.toLowerCase().includes('sonora'))
-        .forEach(item => {
+         data.forEach(item => {
           const subject = item.emailSubject || '—';
           const status = item.status || '—';
           const updated = item.statusChangedDateTime ? new Date(item.statusChangedDateTime).toLocaleString() : '—';
