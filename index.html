@@ -215,6 +215,7 @@ th.sorting.sorting_asc {
       Promise.all(fetchPromises).then(() => {
         initializeCharts(statusCounts);
         $('#envelopes').DataTable({
+         pageLength: 100, // 👈 This sets default entries per page to 100
           autoWidth: false,
           order: [[3, 'desc']], // Updated column index for "Updated"
           columnDefs: [
