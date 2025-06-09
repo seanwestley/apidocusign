@@ -137,7 +137,6 @@ th.sorting.sorting_asc {
               <th>Updated</th>
               <th>Next Signer</th>
               <th>View</th>
-              <th>Logs</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -186,7 +185,7 @@ th.sorting.sorting_asc {
             const badgeClass = badgeColors[status] || 'bg-gray-200 text-gray-700';
             const statusBadge = `<span class="capitalize px-2 py-1 rounded-full text-sm font-semibold ${badgeClass}">${status}</span>`;
             const viewLink = `<a href="/viewEnvelope.html?id=${envelopeId}" class="btn btn-sm bluebtn">View</a>`;
-            const auditLink = `<a href="/audit.html?id=${envelopeId}" class="btn btn-sm btn-orange">Audit Logs</a>`;
+            //const auditLink = `<a href="/audit.html?id=${envelopeId}" class="btn btn-sm btn-orange">Audit Logs</a>`;
 
             tbody.insertAdjacentHTML('beforeend', `
               <tr>
@@ -196,7 +195,7 @@ th.sorting.sorting_asc {
                 <td>${updated}</td>
                 <td>${nextSigner}</td>
                 <td>${viewLink}</td>
-                <td>${auditLink}</td>
+                
               </tr>
             `);
           })
@@ -219,13 +218,13 @@ th.sorting.sorting_asc {
           autoWidth: false,
           order: [[3, 'desc']], // Updated column index for "Updated"
           columnDefs: [
-            { targets: 0, width: '30%' }, // Subject
-            { targets: 1, width: '10%' }, // Invested Amount
+            { targets: 0, width: '35%' }, // Subject
+            { targets: 1, width: '15%' }, // Invested Amount
             { targets: 2, width: '10%' }, // Status
             { targets: 3, width: '15%' }, // Updated
             { targets: 4, width: '15%' }, // Next Signer
             { targets: 5, width: '10%' }, // View
-            { targets: 6, width: '10%' }  // Logs
+           // Logs
           ]
         });
 
