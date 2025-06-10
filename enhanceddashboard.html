@@ -21,95 +21,151 @@
   <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
+    :root {
+      --primary-blue: #1e4882;
+      --secondary-blue: #2563eb;
+      --light-blue: #3b82f6;
+      --accent-blue: #60a5fa;
+      --success-green: #10b981;
+      --warning-orange: #f59e0b;
+      --danger-red: #ef4444;
+      --neutral-gray: #6b7280;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
       min-height: 100vh;
+      margin: 0;
+      padding: 0;
     }
     
     h1, h2, h3, .font-bold, .font-semibold {
       font-family: 'Inter', sans-serif;
+      font-weight: 700;
     }
 
-    .gradient-bg {
-      background: linear-gradient(135deg, #1e4882 0%, #2563eb 50%, #3b82f6 100%);
+    .hero-gradient {
+      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 50%, var(--light-blue) 100%);
+      position: relative;
+      overflow: hidden;
     }
 
-    .glass-effect {
+    .hero-gradient::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="90" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+      pointer-events: none;
+    }
+
+    .glass-card {
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
     }
 
     .chart-container {
       position: relative;
-      height: 300px;
+      height: 320px;
       width: 100%;
     }
 
     .status-card {
-      background: linear-gradient(135deg, #1e4882 0%, #2563eb 100%);
-      transition: all 0.3s ease;
+      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       transform: translateY(0);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .status-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .status-card:hover::before {
+      left: 100%;
     }
 
     .status-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 20px 25px -5px rgba(30, 72, 130, 0.3);
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 25px 50px -12px rgba(30, 72, 130, 0.4);
     }
 
-    .btn-orange {
-      background: linear-gradient(135deg, #f47c3c 0%, #ff6b35 100%);
+    .btn-primary-custom {
+      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
       color: white;
       border: none;
-      transition: all 0.3s ease;
-    }
-
-    .btn-orange:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 20px rgba(244, 124, 60, 0.3);
-    }
-    
-    .bluebtn {
-      background: linear-gradient(135deg, #1e4882 0%, #2563eb 100%);
-      color: white;
-      display: flex;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: 600;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
       justify-content: center;
-      border: none;
-      transition: all 0.3s ease;
-      border-radius: 8px;
-      padding: 8px 16px;
+      min-width: 80px;
     }
 
-    .bluebtn:hover {
+    .btn-primary-custom:hover {
       transform: translateY(-2px);
-      box-shadow: 0 10px 20px rgba(30, 72, 130, 0.3);
+      box-shadow: 0 15px 30px rgba(30, 72, 130, 0.4);
       color: white;
+      text-decoration: none;
     }
 
     .dataTables_wrapper .dataTables_filter input,
     .dataTables_wrapper .dataTables_length select {
-      border-radius: 8px;
+      border-radius: 12px;
       border: 2px solid #e5e7eb;
-      padding: 8px 12px;
+      padding: 12px 16px;
       transition: all 0.3s ease;
+      font-weight: 500;
     }
 
     .dataTables_wrapper .dataTables_filter input:focus,
     .dataTables_wrapper .dataTables_length select:focus {
-      border-color: #1e4882;
-      box-shadow: 0 0 0 3px rgba(30, 72, 130, 0.1);
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 4px rgba(30, 72, 130, 0.1);
       outline: none;
     }
 
-    @media only screen and (max-width: 1024px) {
+    /* Enhanced media queries */
+    @media only screen and (max-width: 1300px) {
       .container {
         max-width: 100% !important;
       }
-    } 
+    }
+
+    @media only screen and (min-width: 1000px) {
+      .chart-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+      }
+    }
+    
+    @media only screen and (max-width: 999px) {
+      .chart-grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
 
     @media only screen and (max-width: 600px) {
       .dataTables_wrapper .col-sm-12 {
@@ -126,10 +182,10 @@
       }
     }
 
-    @keyframes fade-in {
+    @keyframes fadeInUp {
       from { 
         opacity: 0; 
-        transform: translateY(20px);
+        transform: translateY(30px);
       }
       to { 
         opacity: 1; 
@@ -137,220 +193,229 @@
       }
     }
 
-    @keyframes pulse-glow {
-      0%, 100% { 
-        box-shadow: 0 0 20px rgba(30, 72, 130, 0.3);
-      }
-      50% { 
-        box-shadow: 0 0 30px rgba(30, 72, 130, 0.5);
-      }
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
     }
 
     .animate-fade-in {
-      animation: fade-in 0.8s ease-out forwards;
+      animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     }
 
-    .animate-pulse-glow {
-      animation: pulse-glow 2s ease-in-out infinite;
-    }
-
-    /* Enhanced skeleton loading */
-    .skeleton-card {
+    .skeleton-shimmer {
       background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
       background-size: 200% 100%;
-      animation: loading 1.5s infinite;
+      animation: shimmer 2s infinite;
     }
 
-    @keyframes loading {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
-
+    /* Enhanced pagination */
     div#dashboard .pagination li a {
       box-shadow: none !important;
       background: transparent;
-      border: 2px solid #1e4882 !important;
-      color: #1e4882 !important;
-      border-radius: 8px;
-      margin: 0 2px;
-      transition: all 0.3s ease;
+      border: 2px solid var(--primary-blue) !important;
+      color: var(--primary-blue) !important;
+      border-radius: 12px;
+      margin: 0 4px;
+      padding: 10px 16px;
+      font-weight: 600;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     div#dashboard .pagination li.active a {
-      box-shadow: none !important;
-      background: linear-gradient(135deg, #1e4882 0%, #2563eb 100%);
-      border: 2px solid #1e4882 !important;
+      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+      border: 2px solid var(--primary-blue) !important;
       color: #fff !important;
+      transform: scale(1.05);
     }
 
     div#dashboard .pagination li a:hover {
-      background: linear-gradient(135deg, #1e4882 0%, #2563eb 100%) !important;
+      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%) !important;
       color: #fff !important;
       transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(30, 72, 130, 0.3);
     }
 
+    /* Enhanced table styling */
     th.sorting, th.sorting_asc, th.sorting_desc {
-      text-align: center;
-      background: linear-gradient(135deg, #1e4882 0%, #2563eb 100%);
-      color: white;
-      font-weight: 600;
-      padding: 15px 8px;
+      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%) !important;
+      color: white !important;
+      font-weight: 700 !important;
+      padding: 18px 12px !important;
+      text-align: center !important;
+      border: none !important;
+      position: relative;
+      font-size: 14px;
     }
 
     .table-bordered th, .table-bordered td {
       border: 1px solid #e5e7eb;
-      padding: 12px 8px;
+      padding: 16px 12px;
+      vertical-align: middle;
+    }
+
+    .table tbody tr {
+      transition: all 0.3s ease;
     }
 
     .table tbody tr:hover {
       background-color: rgba(30, 72, 130, 0.05);
-      transition: all 0.3s ease;
+      transform: scale(1.01);
     }
 
-    /* Enhanced status badges */
+    /* Clean status badges */
     .status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-weight: 600;
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 25px;
+      font-weight: 700;
       font-size: 12px;
       text-transform: capitalize;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      letter-spacing: 0.5px;
+      min-width: 90px;
+      text-align: center;
     }
 
     .status-completed {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      background: var(--success-green);
       color: white;
     }
 
     .status-in-progress {
-      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      background: var(--warning-orange);
       color: white;
     }
 
     .status-voided {
-      background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+      background: var(--neutral-gray);
       color: white;
     }
 
     .status-deleted {
-      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      background: var(--danger-red);
+      color: white;
+    }
+
+    .status-sent {
+      background: var(--primary-blue);
       color: white;
     }
 
     .status-default {
-      background: linear-gradient(135deg, #1e4882 0%, #2563eb 100%);
+      background: var(--primary-blue);
       color: white;
+    }
+
+    /* Chart card enhancements */
+    .chart-card {
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .chart-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+    }
+
+    .chart-title {
+      color: var(--primary-blue);
+      font-weight: 800;
+      font-size: 18px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    /* Investment amount styling */
+    .investment-amount {
+      font-weight: 700;
+      color: var(--success-green);
+      font-size: 14px;
+    }
+
+    /* Enhanced loading state */
+    .loading-pulse {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
     }
   </style>
 </head>
 <body class="text-gray-800">
-  <div class="container mx-auto px-4 py-8">
+  <div class="container mx-auto px-4 py-8 max-w-7xl">
 
-    <!-- Enhanced Header -->
-    <div class="text-center mb-12">
-      <div class="gradient-bg rounded-3xl p-8 glass-effect animate-pulse-glow">
-        <div class="flex items-center justify-center mb-4">
-          <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mr-4">
-            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-            </svg>
-          </div>
-          <div>
-            <h1 class="text-4xl sm:text-5xl font-bold text-white mb-2">Sonora Wealth KPC</h1>
-            <h2 class="text-2xl sm:text-3xl font-semibold text-blue-100">Onboarding Status</h2>
-          </div>
+    <!-- Award-Winning Header -->
+    <div class="hero-gradient rounded-3xl p-12 mb-12 text-center relative">
+      <div class="relative z-10">
+        <h1 class="text-5xl md:text-6xl font-black text-white mb-4 tracking-tight">
+          Sonora Wealth KPC
+        </h1>
+        <h2 class="text-3xl md:text-4xl font-bold text-blue-100 mb-6">
+          Onboarding Status
+        </h2>
+        <div class="inline-flex items-center bg-white/20 backdrop-blur-sm rounded-full px-6 py-3">
+          <div class="w-3 h-3 bg-green-400 rounded-full mr-3 animate-pulse"></div>
+          <span class="text-white font-semibold text-lg">Powered by KPCx • Real-time Dashboard</span>
         </div>
-        <p class="text-lg text-blue-100 font-medium">Powered by KPCx • Real-time Dashboard</p>
       </div>
     </div>
 
-    <!-- Enhanced Skeleton Placeholder -->
+    <!-- Premium Loading Skeleton -->
     <div id="skeleton" class="space-y-8">
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div class="h-80 skeleton-card rounded-2xl"></div>
-        <div class="h-80 skeleton-card rounded-2xl"></div>
-        <div class="h-80 skeleton-card rounded-2xl"></div>
+      <div class="grid chart-grid gap-8">
+        <div class="h-96 skeleton-shimmer rounded-3xl"></div>
+        <div class="h-96 skeleton-shimmer rounded-3xl"></div>
+        <div class="h-96 skeleton-shimmer rounded-3xl"></div>
       </div>
-      <div class="h-96 skeleton-card rounded-2xl"></div>
+      <div class="h-96 skeleton-shimmer rounded-3xl"></div>
     </div>
 
-    <!-- Enhanced Dashboard -->
+    <!-- Award-Winning Dashboard -->
     <div id="dashboard" class="hidden">
 
-      <!-- Enhanced Charts Section -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+      <!-- Premium Charts Section -->
+      <div class="grid chart-grid gap-8 mb-12">
         
         <!-- Pie Chart Card -->
-        <div class="glass-effect rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300">
-          <div class="flex items-center mb-4">
-            <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center mr-3">
-              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path>
-              </svg>
-            </div>
-            <h3 class="text-lg font-semibold text-gray-800">Status Distribution</h3>
-          </div>
+        <div class="glass-card rounded-3xl p-8 chart-card">
+          <h3 class="chart-title">Status Distribution</h3>
           <div class="chart-container">
             <canvas id="statusPieChart"></canvas>
           </div>
         </div>
 
         <!-- Bar Chart Card -->
-        <div class="glass-effect rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300">
-          <div class="flex items-center mb-4">
-            <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center mr-3">
-              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-              </svg>
-            </div>
-            <h3 class="text-lg font-semibold text-gray-800">Envelope Count</h3>
-          </div>
+        <div class="glass-card rounded-3xl p-8 chart-card">
+          <h3 class="chart-title">Envelope Count</h3>
           <div class="chart-container">
             <canvas id="statusBarChart"></canvas>
           </div>
         </div>
 
         <!-- Status Summary Card -->
-        <div class="glass-effect rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300">
-          <div class="flex items-center mb-6">
-            <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center mr-3">
-              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-              </svg>
-            </div>
-            <h3 class="text-lg font-semibold text-gray-800">Status Summary</h3>
-          </div>
-          <div id="statusGrid" class="grid grid-cols-2 gap-4"></div>
+        <div class="glass-card rounded-3xl p-8 chart-card">
+          <h3 class="chart-title">Status Summary</h3>
+          <div id="statusGrid" class="grid grid-cols-2 gap-6 mt-8"></div>
         </div>
       </div>
 
-      <!-- Enhanced Table Section -->
-      <div class="glass-effect rounded-2xl p-6 shadow-xl">
-        <div class="flex items-center mb-6">
-          <div class="w-12 h-12 gradient-bg rounded-xl flex items-center justify-center mr-4">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-            </svg>
-          </div>
-          <div>
-            <h2 class="text-2xl font-bold text-gray-800">Envelope Management</h2>
-            <p class="text-gray-600">Track and manage all envelope statuses</p>
-          </div>
+      <!-- Premium Table Section -->
+      <div class="glass-card rounded-3xl p-8">
+        <div class="mb-8">
+          <h2 class="text-3xl font-black text-gray-800 mb-2">Envelope Management</h2>
+          <p class="text-gray-600 text-lg font-medium">Track and manage all envelope statuses with precision</p>
         </div>
         
         <div class="overflow-x-auto">
-          <table id="envelopes" class="table table-bordered w-full min-w-[600px] bg-white text-sm sm:text-base rounded-lg overflow-hidden">
+          <table id="envelopes" class="table table-bordered w-full min-w-[600px] bg-white text-sm sm:text-base rounded-2xl overflow-hidden shadow-lg">
             <thead>
               <tr>
-                <th class="text-center">📋 Investment Management</th>
-                <th class="text-center">💰 Investment</th>
-                <th class="text-center">📊 Status</th>
-                <th class="text-center">👤 Next Signer</th>
-                <th class="text-center">🕒 Updated</th>
-                <th class="text-center">👁️ Actions</th>
+                <th>Investment Management</th>
+                <th>Investment</th>
+                <th>Status</th>
+                <th>Next Signer</th>
+                <th>Updated</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody></tbody>
@@ -389,39 +454,36 @@
             const nextSigner = recipientData.signers?.find(signer => signer.status !== "completed")?.name || '—';
             statusCounts[status] = (statusCounts[status] || 0) + 1;
 
-            // Enhanced status badge with icons
+            // Clean status badge without icons
             const getStatusBadge = (status) => {
               const statusLower = status.toLowerCase();
               let badgeClass = 'status-default';
-              let icon = '📄';
               
               if (statusLower === 'completed') {
                 badgeClass = 'status-completed';
-                icon = '✅';
               } else if (statusLower === 'in progress') {
                 badgeClass = 'status-in-progress';
-                icon = '⏳';
               } else if (statusLower === 'voided') {
                 badgeClass = 'status-voided';
-                icon = '❌';
               } else if (statusLower === 'deleted') {
                 badgeClass = 'status-deleted';
-                icon = '🗑️';
+              } else if (statusLower === 'sent') {
+                badgeClass = 'status-sent';
               }
               
-              return `<span class="status-badge ${badgeClass}">${icon} ${status}</span>`;
+              return `<span class="status-badge ${badgeClass}">${status}</span>`;
             };
 
             const statusBadge = getStatusBadge(status);
-            const viewLink = `<a href="/viewEnvelope.html?id=${envelopeId}" class="btn btn-sm bluebtn">👁️ View</a>`;
+            const viewLink = `<a href="/viewEnvelope.html?id=${envelopeId}" class="btn-primary-custom">View</a>`;
 
             tbody.insertAdjacentHTML('beforeend', `
-              <tr class="hover:bg-blue-50 transition-colors">
-                <td class="font-medium">${subject}</td>
-                <td class="text-center font-semibold text-green-600">$${investedAmount}</td>
+              <tr>
+                <td class="font-semibold text-gray-800">${subject}</td>
+                <td class="text-center investment-amount">$${investedAmount}</td>
                 <td class="text-center">${statusBadge}</td>
-                <td class="text-center">${nextSigner}</td>
-                <td class="text-center text-gray-600">${updated}</td>
+                <td class="text-center font-medium text-gray-700">${nextSigner}</td>
+                <td class="text-center text-gray-600 font-medium">${updated}</td>
                 <td class="text-center">${viewLink}</td>
               </tr>
             `);
@@ -430,13 +492,8 @@
             console.error('Error fetching data:', err);
             tbody.insertAdjacentHTML('beforeend', `
               <tr>
-                <td colspan="6" class="text-center text-red-600 py-8">
-                  <div class="flex items-center justify-center">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    Error loading envelope data
-                  </div>
+                <td colspan="6" class="text-center text-red-600 py-8 font-semibold">
+                  Error loading envelope data
                 </td>
               </tr>
             `);
@@ -450,24 +507,24 @@
         $('#envelopes').DataTable({
          pageLength: 100,
           autoWidth: false,
-          order: [[4, 'desc']], // Updated column index for "Updated"
+          order: [[4, 'desc']],
           columnDefs: [
-            { targets: 0, width: '35%' }, // Subject
-            { targets: 1, width: '15%' }, // Invested Amount
-            { targets: 2, width: '15%' }, // Status
-            { targets: 3, width: '15%' }, // Next Signer
-            { targets: 4, width: '15%' }, // Updated
-            { targets: 5, width: '10%' }, // View
+            { targets: 0, width: '35%' },
+            { targets: 1, width: '15%' },
+            { targets: 2, width: '15%' },
+            { targets: 3, width: '15%' },
+            { targets: 4, width: '15%' },
+            { targets: 5, width: '10%' },
           ],
           language: {
-            search: "🔍 Search envelopes:",
+            search: "Search envelopes:",
             lengthMenu: "Show _MENU_ envelopes per page",
             info: "Showing _START_ to _END_ of _TOTAL_ envelopes",
             paginate: {
-              first: "⏮️",
-              last: "⏭️",
-              next: "▶️",
-              previous: "◀️"
+              first: "First",
+              last: "Last",
+              next: "Next",
+              previous: "Previous"
             }
           }
         });
@@ -478,11 +535,11 @@
         dash.classList.remove('hidden');
         dash.classList.add('animate-fade-in');
       }).catch(err => {
-        document.body.innerHTML += `<div class="fixed top-4 right-4 bg-red-500 text-white p-4 rounded-lg shadow-lg">Error loading data: ${err.message}</div>`;
+        console.error('Error loading data:', err);
       });
     })
     .catch(err => {
-      document.body.innerHTML += `<div class="fixed top-4 right-4 bg-red-500 text-white p-4 rounded-lg shadow-lg">Error loading data: ${err.message}</div>`;
+      console.error('Error loading data:', err);
     });
 
   function initializeCharts(statusCounts) {
@@ -491,11 +548,11 @@
       'In Progress': '#f59e0b',
       voided: '#6b7280',
       deleted: '#ef4444',
-      status: '#f47c3c',
+      sent: '#1e4882',
       default: '#1e4882'
     };
 
-    // Enhanced Pie Chart
+    // Premium Doughnut Chart
     new Chart(document.getElementById('statusPieChart'), {
       type: 'doughnut',
       data: {
@@ -503,10 +560,10 @@
         datasets: [{
           data: Object.values(statusCounts),
           backgroundColor: Object.keys(statusCounts).map(status => palette[status] || palette.default),
-          borderWidth: 3,
+          borderWidth: 4,
           borderColor: '#ffffff',
-          hoverBorderWidth: 5,
-          hoverOffset: 10
+          hoverBorderWidth: 6,
+          hoverOffset: 15
         }]
       },
       options: {
@@ -516,32 +573,27 @@
           legend: { 
             position: 'bottom',
             labels: {
-              padding: 20,
+              padding: 25,
               usePointStyle: true,
-              font: { size: 12, weight: '600' }
+              font: { size: 14, weight: '700' },
+              color: '#374151'
             }
-          },
-          title: { 
-            display: true, 
-            text: 'Status Distribution',
-            font: { size: 16, weight: 'bold' },
-            padding: 20
           }
         },
-        cutout: '60%'
+        cutout: '65%'
       }
     });
 
-    // Enhanced Bar Chart
+    // Premium Bar Chart
     new Chart(document.getElementById('statusBarChart'), {
       type: 'bar',
       data: {
         labels: Object.keys(statusCounts),
         datasets: [{
-          label: 'Envelope Count',
+          label: 'Count',
           data: Object.values(statusCounts),
           backgroundColor: Object.keys(statusCounts).map(status => palette[status] || palette.default),
-          borderRadius: 8,
+          borderRadius: 12,
           borderSkipped: false,
         }]
       },
@@ -549,12 +601,6 @@
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          title: { 
-            display: true, 
-            text: 'Envelope Count by Status',
-            font: { size: 16, weight: 'bold' },
-            padding: 20
-          },
           legend: { display: false }
         },
         scales: {
@@ -562,12 +608,16 @@
             beginAtZero: true,
             ticks: { 
               stepSize: 1,
-              font: { weight: '600' }
+              font: { weight: '600', size: 12 },
+              color: '#6b7280'
             },
-            grid: { color: 'rgba(0,0,0,0.1)' }
+            grid: { color: 'rgba(0,0,0,0.05)' }
           },
           x: {
-            ticks: { font: { weight: '600' } },
+            ticks: { 
+              font: { weight: '700', size: 12 },
+              color: '#374151'
+            },
             grid: { display: false }
           }
         }
@@ -577,21 +627,13 @@
 
   function updateStatusGrid(statusCounts) {
     const grid = document.getElementById('statusGrid');
-    const statusIcons = {
-      'completed': '✅',
-      'in progress': '⏳',
-      'voided': '❌',
-      'deleted': '🗑️'
-    };
     
     Object.entries(statusCounts).forEach(([status, count]) => {
       const card = document.createElement('div');
-      const icon = statusIcons[status.toLowerCase()] || '📄';
-      card.className = "status-card rounded-xl p-4 text-center text-white font-semibold shadow-lg";
+      card.className = "status-card rounded-2xl p-6 text-center text-white font-bold shadow-lg";
       card.innerHTML = `
-        <div class="text-2xl mb-2">${icon}</div>
-        <div class="text-sm opacity-90 mb-1">${status}</div>
-        <div class="text-2xl font-bold">${count}</div>
+        <div class="text-sm opacity-90 mb-2 uppercase tracking-wider">${status}</div>
+        <div class="text-3xl font-black">${count}</div>
       `;
       grid.appendChild(card);
     });
