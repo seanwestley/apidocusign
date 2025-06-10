@@ -36,69 +36,32 @@
     .bluebtn {
       background-color: #1e4882;
       color: white;
-      display: flex;
-      justify-content: center;
+ display: flex;
+    justify-content: center;
     }
     .dataTables_wrapper .dataTables_filter input,
     .dataTables_wrapper .dataTables_length select {
       border-radius: 4px;
     }
-    
-    /* Modified media queries to maintain 3 columns until 999px */
-    @media only screen and (max-width: 1300px) {
-      .container {
+        @media only screen and  (max-width: 1024px) {
+    .container {
         max-width: 100% !important;
-      }
     }
-    
-    /* Keep 3 columns until 999px */
-    @media only screen and (min-width: 1000px) {
-      .chart-grid {
-        grid-template-columns: repeat(3, 1fr) !important;
-      }
-    }
-    
-    /* Switch to 1 column below 999px */
-    @media only screen and (max-width: 999px) {
-      .chart-grid {
-        grid-template-columns: 1fr !important;
-      }
-    }
-    
-    /* Fix for charts on hover */
-    .chart-container {
-      position: relative;
-      width: 100%;
-      height: 100%;
-    }
-    
-    .chart-container canvas {
-      width: 100% !important;
-      height: auto !important;
-      min-height: 250px;
-    }
-    
-    /* Prevent charts from shrinking on hover */
-    .chart-container:hover canvas {
-      opacity: 1 !important;
-      transform: none !important;
-    }
-    
-    @media only screen and (max-width: 600px) {
-      .dataTables_wrapper .col-sm-12 {
-        width: 100%;
-        overflow: scroll;
-        margin-top: 20px;
-        overflow-x: auto !important;
-        white-space: nowrap;
-        display: block;
-        padding: 10px !important; 
-      }
-      table#envelopes {
-        width: 1000px !important;
-      }
-    }
-    
+} 
+@media only screen and (max-width: 600px) {
+.dataTables_wrapper .col-sm-12 {
+    width: 100%;
+    overflow: scroll;
+    margin-top: 20px;
+    overflow-x: auto !important;
+    white-space: nowrap;
+    display: block;
+    padding: 10px !important; 
+}
+table#envelopes {
+    width: 1000px !important;
+}
+}
     @keyframes fade-in {
       from { opacity: 0; }
       to { opacity: 1; }
@@ -108,26 +71,26 @@
     }
 
     div#dashboard .pagination li a {
-      box-shadow: none !important;
-      background: transparent;
-      border: 1px solid #1e4882 !important;
-      color: #1e4882 !important;
-    }
+box-shadow: none !important;
+background: transparent;
+border: 1px solid #1e4882 !important;
+color: #1e4882 !important;
+}
 
-    div#dashboard .pagination li.active a {
-      box-shadow: none !important;
-      background: #1e4882;
-      border: 1px solid #1e4882 !important;
-      color: #fff !important;
-    }
+div#dashboard .pagination li.active a {
+box-shadow: none !important;
+background: #1e4882;
+border: 1px solid #1e4882 !important;
+color: #fff !important;
+}
 
-    div#dashboard .pagination li a:hover {
-      background: #1e4882 !important;
-      color: #fff !important;
-    }
-    th.sorting.sorting_asc {
-      text-align: center;
-    }
+div#dashboard .pagination li a:hover {
+background: #1e4882 !important;
+color: #fff !important;
+}
+th.sorting.sorting_asc {
+    text-align: center;
+}
   </style>
 </head>
 <body class="bg-gray-100 text-gray-800 p-4 ">
@@ -153,16 +116,12 @@
     <div id="dashboard" class="hidden">
 
       <!-- Charts -->
-      <div class="grid chart-grid gap-4 mb-12">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
         <div class="bg-white rounded-lg shadow-md p-4">
-          <div class="chart-container">
-            <canvas id="statusPieChart"></canvas>
-          </div>
+          <canvas id="statusPieChart"></canvas>
         </div>
         <div class="bg-white rounded-lg shadow-md p-4">
-          <div class="chart-container">
-            <canvas id="statusBarChart"></canvas>
-          </div>
+          <canvas id="statusBarChart"></canvas>
         </div>
         <div class="bg-white rounded-lg shadow-md p-4">
           <h2 class="text-lg sm:text-xl font-semibold mb-4 text-center text-[#1e4882]">Envelope Status Summary</h2>
@@ -305,8 +264,6 @@
         }]
       },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
         plugins: {
           legend: { position: 'bottom' },
           title: { display: true, text: 'Envelope Status Distribution' }
@@ -325,8 +282,6 @@
         }]
       },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
         plugins: {
           title: { display: true, text: 'Envelope Count by Status' }
         },
