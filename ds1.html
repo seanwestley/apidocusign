@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sonora Investment Management</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- DataTables -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      /* Updated color palette */
+      --primary-blue: #0B3041;
+      --secondary-blue: #118DD1;
+      --success-green: #196B24;
+      --warning-orange: #E97132;
+      --danger-red: #ef4444;
+      --neutral-gray: #6b7280;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+    }
+    
+    h1, h2, h3, .font-bold, .font-semibold {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+    }
+
+    /* Updated header gradient to match envelope view */
+    .hero-gradient {
+      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-gradient::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="90" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+      pointer-events: none;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+    }
+
+    .chart-container {
+      position: relative;
+      height: 320px;
+      width: 100%;
+    }
+
+    /* Updated status card gradient */
+    .status-card {
+      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      transform: translateY(0);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .status-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .status-card:hover::before {
+      left: 100%;
+    }
+
+    .status-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 25px 50px -12px rgba(11, 48, 65, 0.4);
+    }
+
+    /* Updated button style */
+    .btn-primary-custom {
+      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: 600;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 80px;
+    }
+
+    .btn-primary-custom:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 30px rgba(11, 48, 65, 0.4);
+      color: white;
+      text-decoration: none;
+    }
+
+    .dataTables_wrapper .dataTables_filter input,
+    .dataTables_wrapper .dataTables_length select {
+      border-radius: 12px;
+      border: 2px solid #e5e7eb;
+      padding: 12px 16px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .dataTables_wrapper .dataTables_filter input:focus,
+    .dataTables_wrapper .dataTables_length select:focus {
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 4px rgba(11, 48, 65, 0.1);
+      outline: none;
+    }
+
+    /* Enhanced media queries */
+    @media only screen and (max-width: 1300px) {
+      .container {
+        max-width: 100% !important;
+      }
+    }
+
+    @media only screen and (min-width: 1000px) {
+      .chart-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+      }
+    }
+    
+    @media only screen and (max-width: 999px) {
+      .chart-grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    @media only screen and (max-width: 600px) {
+      .dataTables_wrapper .col-sm-12 {
+        width: 100%;
+        overflow: scroll;
+        margin-top: 20px;
+        overflow-x: auto !important;
+        white-space: nowrap;
+        display: block;
+        padding: 10px !important; 
+      }
+      table#envelopes {
+        width: 1000px !important;
+      }
+    }
+
+    @keyframes fadeInUp {
+      from { 
+        opacity: 0; 
+        transform: translateY(30px);
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    .animate-fade-in {
+      animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    .skeleton-shimmer {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 2s infinite;
+    }
+
+    /* Enhanced pagination */
+    div#dashboard .pagination li a {
+      box-shadow: none !important;
+      background: transparent;
+      border: 2px solid var(--primary-blue) !important;
+      color: var(--primary-blue) !important;
+      border-radius: 12px;
+      margin: 0 4px;
+      padding: 10px 16px;
+      font-weight: 600;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    div#dashboard .pagination li.active a {
+      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+      border: 2px solid var(--primary-blue) !important;
+      color: #fff !important;
+      transform: scale(1.05);
+    }
+
+    div#dashboard .pagination li a:hover {
+      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%) !important;
+      color: #fff !important;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(11, 48, 65, 0.3);
+    }
+
+    /* Enhanced table styling */
+    th.sorting, th.sorting_asc, th.sorting_desc {
+      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%) !important;
+      color: white !important;
+      font-weight: 700 !important;
+      padding: 18px 12px !important;
+      text-align: center !important;
+      border: none !important;
+      position: relative;
+      font-size: 14px;
+    }
+
+    .table-bordered th, .table-bordered td {
+      border: 1px solid #e5e7eb;
+      padding: 16px 12px;
+      vertical-align: middle;
+    }
+
+    .table tbody tr {
+      transition: all 0.3s ease;
+    }
+
+    .table tbody tr:hover {
+      background-color: rgba(11, 48, 65, 0.05);
+      transform: scale(1.01);
+    }
+
+    /* Updated status badges */
+    .status-badge {
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 25px;
+      font-weight: 700;
+      font-size: 12px;
+      text-transform: capitalize;
+      letter-spacing: 0.5px;
+      min-width: 90px;
+      text-align: center;
+    }
+
+    .status-completed {
+      background: var(--success-green);
+      color: white;
+    }
+
+    .status-in-progress {
+      background: var(--warning-orange);
+      color: white;
+    }
+
+    .status-voided {
+      background: var(--neutral-gray);
+      color: white;
+    }
+
+    .status-deleted {
+      background: var(--danger-red);
+      color: white;
+    }
+
+    .status-sent {
+      background: var(--secondary-blue);
+      color: white;
+    }
+
+    .status-default {
+      background: var(--primary-blue);
+      color: white;
+    }
+
+    /* Chart card enhancements */
+    .chart-card {
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .chart-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+    }
+
+    .chart-title {
+      color: var(--primary-blue);
+      font-weight: 800;
+      font-size: 18px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    /* Investment amount styling */
+    .investment-amount {
+      font-weight: 700;
+      color: var(--success-green);
+      font-size: 14px;
+    }
+
+    /* Enhanced loading state */
+    .loading-pulse {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+  </style>
+</head>
+<body class="text-gray-800">
+  <!-- Header with Back Button - Matching the envelope view style -->
+  <div class="hero-gradient text-white py-6 shadow-lg">
+    <div class="container mx-auto px-6">
+      <div class="flex items-center justify-between">
+        <button 
+          onclick="goBack()" 
+          class="flex items-center space-x-2 bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-all duration-200 backdrop-blur-sm"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          <span class="font-medium">Back</span>
+        </button>
+        
+        <div class="text-center">
+          <h1 class="text-3xl font-bold">Sonora Investment Management</h1>
+          <p class="text-white/80 mt-1">Dashboard Overview</p>
+        </div>
+        
+        <div class="w-20"></div> <!-- Spacer for centering -->
+      </div>
+    </div>
+  </div>
+
+  <div class="container mx-auto px-4 py-8 max-w-7xl">
+    <!-- Premium Loading Skeleton -->
+    <div id="skeleton" class="space-y-8">
+      <div class="grid chart-grid gap-8">
+        <div class="h-96 skeleton-shimmer rounded-3xl"></div>
+        <div class="h-96 skeleton-shimmer rounded-3xl"></div>
+        <div class="h-96 skeleton-shimmer rounded-3xl"></div>
+      </div>
+      <div class="h-96 skeleton-shimmer rounded-3xl"></div>
+    </div>
+
+    <!-- Award-Winning Dashboard -->
+    <div id="dashboard" class="hidden">
+
+      <!-- Premium Charts Section -->
+      <div class="grid chart-grid gap-8 mb-12">
+        
+        <!-- Pie Chart Card -->
+        <div class="glass-card rounded-3xl p-8 chart-card">
+          <h3 class="chart-title">Status Distribution</h3>
+          <div class="chart-container">
+            <canvas id="statusPieChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Bar Chart Card -->
+        <div class="glass-card rounded-3xl p-8 chart-card">
+          <h3 class="chart-title">Envelope Count</h3>
+          <div class="chart-container">
+            <canvas id="statusBarChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Status Summary Card -->
+        <div class="glass-card rounded-3xl p-8 chart-card">
+          <h3 class="chart-title">Status Summary</h3>
+          <div id="statusGrid" class="grid grid-cols-2 gap-6 mt-8"></div>
+        </div>
+      </div>
+
+      <!-- Premium Table Section -->
+      <div class="glass-card rounded-3xl p-8">
+        <div class="mb-8">
+          <h2 class="text-3xl font-black text-gray-800 mb-2">Envelope Management</h2>
+          <p class="text-gray-600 text-lg font-medium">Track and manage all envelope statuses with precision</p>
+        </div>
+        
+        <div class="overflow-x-auto">
+          <table id="envelopes" class="table table-bordered w-full min-w-[600px] bg-white text-sm sm:text-base rounded-2xl overflow-hidden shadow-lg">
+            <thead>
+              <tr>
+                <th>Investment Management</th>
+                <th>Investment</th>
+                <th>Status</th>
+                <th>Next Signer</th>
+                <th>Updated</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+<script>
+  function goBack() {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      // Fallback to dashboard if no history
+      window.location.href = '/index.html';
+    }
+  }
+
+  fetch('https://docusign-portal.netlify.app/.netlify/functions/fetchsonora')
+    .then(res => res.json())
+    .then(data => {
+      const tbody = document.querySelector('#envelopes tbody');
+      const statusCounts = {};
+      const fetchPromises = [];
+
+         data.forEach(item => {
+          const subject = item.emailSubject || '—';
+          const status = item.status || '—';
+          const updated = item.statusChangedDateTime ? new Date(item.statusChangedDateTime).toLocaleString() : '—';
+          const envelopeId = item.envelopeId || '—';
+
+          const fetchRecipientAndAmount = Promise.all([
+            fetch(`https://docusign-portal.netlify.app/.netlify/functions/getRecipients?id=${envelopeId}`).then(res => res.json()),
+            fetch(`https://docusign-portal.netlify.app/.netlify/functions/fetchfields?id=${envelopeId}`)
+              .then(res => res.json())
+              .then(tabData => {
+                const investTab = tabData.numberTabs?.find(tab => tab.tabLabel === 'INVEST AMOUNT' && tab.documentId === "1");
+                return investTab?.value || '—';
+              })
+              .catch(() => '—')
+          ])
+          .then(([recipientData, investedAmount]) => {
+            const nextSigner = recipientData.signers?.find(signer => signer.status !== "completed")?.name || '—';
+            statusCounts[status] = (statusCounts[status] || 0) + 1;
+
+            // Clean status badge without icons
+            const getStatusBadge = (status) => {
+              const statusLower = status.toLowerCase();
+              let badgeClass = 'status-default';
+              
+              if (statusLower === 'completed') {
+                badgeClass = 'status-completed';
+              } else if (statusLower === 'in progress') {
+                badgeClass = 'status-in-progress';
+              } else if (statusLower === 'voided') {
+                badgeClass = 'status-voided';
+              } else if (statusLower === 'deleted') {
+                badgeClass = 'status-deleted';
+              } else if (statusLower === 'sent') {
+                badgeClass = 'status-sent';
+              }
+              
+              return `<span class="status-badge ${badgeClass}">${status}</span>`;
+            };
+
+            const statusBadge = getStatusBadge(status);
+            const viewLink = `<a href="/viewEnvelope.html?id=${envelopeId}" class="btn-primary-custom">View</a>`;
+
+            tbody.insertAdjacentHTML('beforeend', `
+              <tr>
+                <td class="font-semibold text-gray-800">${subject}</td>
+                <td class="text-center investment-amount">$${investedAmount}</td>
+                <td class="text-center">${statusBadge}</td>
+                <td class="text-center font-medium text-gray-700">${nextSigner}</td>
+                <td class="text-center text-gray-600 font-medium">${updated}</td>
+                <td class="text-center">${viewLink}</td>
+              </tr>
+            `);
+          })
+          .catch(err => {
+            console.error('Error fetching data:', err);
+            tbody.insertAdjacentHTML('beforeend', `
+              <tr>
+                <td colspan="6" class="text-center text-red-600 py-8 font-semibold">
+                  Error loading envelope data
+                </td>
+              </tr>
+            `);
+          });
+
+          fetchPromises.push(fetchRecipientAndAmount);
+        });
+
+      Promise.all(fetchPromises).then(() => {
+        initializeCharts(statusCounts);
+        $('#envelopes').DataTable({
+         pageLength: 100,
+          autoWidth: false,
+          order: [[4, 'desc']],
+          columnDefs: [
+            { targets: 0, width: '35%' },
+            { targets: 1, width: '15%' },
+            { targets: 2, width: '15%' },
+            { targets: 3, width: '15%' },
+            { targets: 4, width: '15%' },
+            { targets: 5, width: '10%' },
+          ],
+          language: {
+            search: "Search envelopes:",
+            lengthMenu: "Show _MENU_ envelopes per page",
+            info: "Showing _START_ to _END_ of _TOTAL_ envelopes",
+            paginate: {
+              first: "First",
+              last: "Last",
+              next: "Next",
+              previous: "Previous"
+            }
+          }
+        });
+
+        updateStatusGrid(statusCounts);
+        document.getElementById('skeleton').style.display = 'none';
+        const dash = document.getElementById('dashboard');
+        dash.classList.remove('hidden');
+        dash.classList.add('animate-fade-in');
+      }).catch(err => {
+        console.error('Error loading data:', err);
+      });
+    })
+    .catch(err => {
+      console.error('Error loading data:', err);
+    });
+
+  function initializeCharts(statusCounts) {
+    // Keeping the chart colors as requested
+    const palette = {
+      completed: '#10b981',
+      'In Progress': '#f59e0b',
+      voided: '#6b7280',
+      deleted: '#ef4444',
+      sent: '#1e4882',
+      default: '#1e4882'
+    };
+
+    // Premium Doughnut Chart
+    new Chart(document.getElementById('statusPieChart'), {
+      type: 'doughnut',
+      data: {
+        labels: Object.keys(statusCounts),
+        datasets: [{
+          data: Object.values(statusCounts),
+          backgroundColor: Object.keys(statusCounts).map(status => palette[status] || palette.default),
+          borderWidth: 4,
+          borderColor: '#ffffff',
+          hoverBorderWidth: 6,
+          hoverOffset: 15
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { 
+            position: 'bottom',
+            labels: {
+              padding: 25,
+              usePointStyle: true,
+              font: { size: 14, weight: '700' },
+              color: '#374151'
+            }
+          }
+        },
+        cutout: '65%'
+      }
+    });
+
+    // Premium Bar Chart
+    new Chart(document.getElementById('statusBarChart'), {
+      type: 'bar',
+      data: {
+        labels: Object.keys(statusCounts),
+        datasets: [{
+          label: 'Count',
+          data: Object.values(statusCounts),
+          backgroundColor: Object.keys(statusCounts).map(status => palette[status] || palette.default),
+          borderRadius: 12,
+          borderSkipped: false,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { 
+              stepSize: 1,
+              font: { weight: '600', size: 12 },
+              color: '#6b7280'
+            },
+            grid: { color: 'rgba(0,0,0,0.05)' }
+          },
+          x: {
+            ticks: { 
+              font: { weight: '700', size: 12 },
+              color: '#374151'
+            },
+            grid: { display: false }
+          }
+        }
+      }
+    });
+  }
+
+  function updateStatusGrid(statusCounts) {
+    const grid = document.getElementById('statusGrid');
+    
+    Object.entries(statusCounts).forEach(([status, count]) => {
+      const card = document.createElement('div');
+      card.className = "status-card rounded-2xl p-6 text-center text-white font-bold shadow-lg";
+      card.innerHTML = `
+        <div class="text-sm opacity-90 mb-2 uppercase tracking-wider">${status}</div>
+        <div class="text-3xl font-black">${count}</div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+</script>
+
+</body>
+</html>
