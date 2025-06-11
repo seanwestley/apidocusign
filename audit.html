@@ -3,167 +3,463 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Audit Log - Envelope</title>
+  <title>Audit Log - Sonora Wealth</title>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'primary': '#0B3041',
+            'secondary': '#118DD1', 
+            'success': '#196B24',
+            'warning': '#E97132'
+          }
+        }
+      }
+    }
+  </script>
 
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
   <style>
-     body {
-      font-family: Arial, sans-serif;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .animate-fade-in {
+      animation: fadeIn 0.6s ease-out forwards;
+    }
+    
+    .animate-pulse-custom {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    
+    .gradient-bg {
+      background: linear-gradient(135deg, #0B3041 0%, #118DD1 100%);
+    }
+    
+    .card-hover {
+      transition: all 0.3s ease;
+    }
+    
+    .card-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    .bg-primary-light {
+      background-color: rgba(17, 141, 209, 0.1);
+    }
+
+    .bg-success-light {
+      background-color: rgba(25, 107, 36, 0.1);
+    }
+
+    .bg-warning-light {
+      background-color: rgba(233, 113, 50, 0.1);
+    }
+
+    .text-primary {
+      color: #118DD1;
+    }
+
+    .text-success {
+      color: #196B24;
+    }
+
+    .text-warning {
+      color: #E97132;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 300px;
+      width: 100%;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: capitalize;
+    }
+
+    .status-sent {
+      background: #118DD1;
+      color: white;
+    }
+
+    .status-completed {
+      background: #196B24;
+      color: white;
+    }
+
+    .status-voided {
+      background: #6b7280;
+      color: white;
+    }
+
+    .status-created {
+      background: #E97132;
+      color: white;
+    }
+
+    .status-default {
+      background: #0B3041;
+      color: white;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
   </style>
 </head>
-<body class="bg-gray-100 text-gray-800 p-6">
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen font-sans text-gray-800">
 
-  <!-- Page Title -->
-  <div class="text-center mb-10">
-    <h1 class="text-4xl font-bold text-indigo-700">Audit Log Summary - Envelope</h1>
-    <p class="text-gray-500 mt-2 text-lg">Track every envelope action here</p>
-  </div>
-
-  <!-- Charts & Summary Grid -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-    <div class="bg-white rounded-lg shadow-md p-4">
-      <canvas id="lineChart"></canvas>
-    </div>
-    <div class="bg-white rounded-lg shadow-md p-4">
-      <canvas id="barChart"></canvas>
-    </div>
-    <div class="bg-white rounded-lg shadow-md p-6 flex flex-col justify-center">
-      <h2 class="text-xl font-semibold mb-4 text-center">Event Summary</h2>
-      <div class="space-y-2 text-center">
-        <p id="totalCount" class="text-gray-700 text-base">Total Events: 0</p>
-        <p id="totalSent" class="text-gray-700 text-base">Sent Events: 0</p>
-        <p id="totalVoided" class="text-gray-700 text-base">Voided Events: 0</p>
+  <!-- Header with Back Button -->
+  <div class="gradient-bg text-white py-6 shadow-lg">
+    <div class="container mx-auto max-w-6xl px-6">
+      <div class="flex items-center justify-between">
+        <button 
+          onclick="goBack()" 
+          class="flex items-center space-x-2 bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-all duration-200 backdrop-blur-sm"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          <span class="font-medium">Back</span>
+        </button>
+        
+        <div class="text-center">
+          <h1 class="text-3xl font-bold">🔍 Audit Log Summary</h1>
+          <p class="text-white/80 mt-1">Envelope Activity Tracking</p>
+        </div>
+        
+        <div class="w-20"></div> <!-- Spacer for centering -->
       </div>
     </div>
   </div>
 
-  <!-- Audit Event Table -->
-  <div class="bg-white p-6 rounded-lg shadow-md">
-    <h3 class="text-2xl font-semibold mb-4">Event Details</h3>
-    <div class="overflow-x-auto">
-      <table id="auditTable" class="min-w-full table-auto border border-gray-200 text-sm">
-        <thead class="bg-indigo-100 text-indigo-800 font-semibold">
-          <tr>
-            <th class="px-4 py-2 border">Timestamp</th>
-            <th class="px-4 py-2 border">Action</th>
-            <th class="px-4 py-2 border">User</th>
-            <th class="px-4 py-2 border">Status</th>
-            <th class="px-4 py-2 border">Message</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white text-gray-800"></tbody>
-      </table>
+  <!-- Main Content -->
+  <div class="container mx-auto max-w-6xl py-8 px-6">
+    
+    <!-- Loading Skeleton -->
+    <div id="loadingSkeleton" class="space-y-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="h-80 bg-gray-200 rounded-2xl animate-pulse-custom"></div>
+        <div class="h-80 bg-gray-200 rounded-2xl animate-pulse-custom"></div>
+        <div class="h-80 bg-gray-200 rounded-2xl animate-pulse-custom"></div>
+      </div>
+      <div class="h-96 bg-gray-200 rounded-2xl animate-pulse-custom"></div>
+    </div>
+
+    <!-- Charts & Summary Grid -->
+    <div id="auditContent" class="hidden">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        
+        <!-- Timeline Chart -->
+        <div class="bg-white rounded-2xl shadow-xl p-6 card-hover animate-fade-in">
+          <div class="gradient-bg text-white p-4 rounded-xl mb-4">
+            <h3 class="text-lg font-bold flex items-center">
+              <span class="mr-2">📈</span> Event Timeline
+            </h3>
+          </div>
+          <div class="chart-container">
+            <canvas id="lineChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Action Distribution Chart -->
+        <div class="bg-white rounded-2xl shadow-xl p-6 card-hover animate-fade-in">
+          <div class="gradient-bg text-white p-4 rounded-xl mb-4">
+            <h3 class="text-lg font-bold flex items-center">
+              <span class="mr-2">📊</span> Action Distribution
+            </h3>
+          </div>
+          <div class="chart-container">
+            <canvas id="barChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Event Summary -->
+        <div class="bg-white rounded-2xl shadow-xl p-6 card-hover animate-fade-in">
+          <div class="gradient-bg text-white p-4 rounded-xl mb-4">
+            <h3 class="text-lg font-bold flex items-center">
+              <span class="mr-2">📋</span> Event Summary
+            </h3>
+          </div>
+          <div class="space-y-4">
+            <div class="bg-primary-light rounded-xl p-4">
+              <h4 class="text-sm font-semibold text-primary uppercase tracking-wide mb-1">Total Events</h4>
+              <p id="totalCount" class="text-2xl font-bold text-gray-800">0</p>
+            </div>
+            <div class="bg-success-light rounded-xl p-4">
+              <h4 class="text-sm font-semibold text-success uppercase tracking-wide mb-1">Sent Events</h4>
+              <p id="totalSent" class="text-2xl font-bold text-gray-800">0</p>
+            </div>
+            <div class="bg-warning-light rounded-xl p-4">
+              <h4 class="text-sm font-semibold text-warning uppercase tracking-wide mb-1">Status Changes</h4>
+              <p id="totalStatusChanges" class="text-2xl font-bold text-gray-800">0</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Audit Event Table -->
+      <div class="bg-white rounded-2xl shadow-xl overflow-hidden card-hover animate-fade-in">
+        <!-- Table Header -->
+        <div class="gradient-bg text-white p-6">
+          <div class="flex items-center space-x-3">
+            <div class="text-3xl">📝</div>
+            <div>
+              <h2 class="text-xl font-bold">Event Details</h2>
+              <p class="text-blue-100">Complete audit trail for this envelope</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table Content -->
+        <div class="p-6">
+          <div class="overflow-x-auto">
+            <table id="auditTable" class="min-w-full table-auto">
+              <thead>
+                <tr class="border-b-2 border-gray-200">
+                  <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wide">Timestamp</th>
+                  <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wide">Action</th>
+                  <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wide">User</th>
+                  <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wide">Status</th>
+                  <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wide">Message</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div id="errorState" class="hidden bg-red-50 border border-red-200 rounded-2xl p-8 text-center">
+      <div class="text-red-500 text-6xl mb-4">⚠️</div>
+      <h2 class="text-2xl font-bold text-red-800 mb-2">Failed to Load Audit Log</h2>
+      <p id="errorMessage" class="text-red-600 mb-6"></p>
+      <button 
+        onclick="location.reload()" 
+        class="px-6 py-3 rounded-lg font-medium transition-colors text-white"
+        style="background: linear-gradient(135deg, #E97132 0%, rgba(233, 113, 50, 0.8) 100%);"
+      >
+        Try Again
+      </button>
     </div>
   </div>
 
   <!-- Script -->
   <script>
+    function goBack() {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        // Fallback to dashboard if no history
+        window.location.href = '/index.html';
+      }
+    }
+
+    function showError(message) {
+      document.getElementById('loadingSkeleton').classList.add('hidden');
+      document.getElementById('errorMessage').textContent = message;
+      document.getElementById('errorState').classList.remove('hidden');
+    }
+
+    function getStatusBadge(status) {
+      const statusLower = status?.toLowerCase() || '';
+      let badgeClass = 'status-default';
+      
+      if (statusLower === 'completed') {
+        badgeClass = 'status-completed';
+      } else if (statusLower === 'sent') {
+        badgeClass = 'status-sent';
+      } else if (statusLower === 'voided') {
+        badgeClass = 'status-voided';
+      } else if (statusLower === 'created') {
+        badgeClass = 'status-created';
+      }
+      
+      return `<span class="status-badge ${badgeClass}">${status || 'Unknown'}</span>`;
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
       const urlParams = new URLSearchParams(window.location.search);
       const envelopeId = urlParams.get('id');
 
+      if (!envelopeId) {
+        showError('Envelope ID is required in the URL parameters.');
+        return;
+      }
+
       fetch(`https://docusign-portal.netlify.app/.netlify/functions/audit?id=${envelopeId}`)
-        .then(response => response.json())
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
         .then(data => {
           const events = data;
           const labels = [];
           const eventActions = [];
-          const eventCounts = { sent: 0, voided: 0 };
+          const eventCounts = { sent: 0, voided: 0, statusChanges: 0 };
           const eventDetails = [];
 
-          events.forEach(event => {
-            const logTime = new Date(event.eventFields.find(f => f.name === 'logTime').value);
-            const action = event.eventFields.find(f => f.name === 'Action').value;
-            const user = event.eventFields.find(f => f.name === 'UserName').value;
-            const status = event.eventFields.find(f => f.name === 'EnvelopeStatus').value;
-            const message = event.eventFields.find(f => f.name === 'Message').value;
+          events.forEach((event, index) => {
+            const logTime = new Date(event.eventFields.find(f => f.name === 'logTime')?.value);
+            const action = event.eventFields.find(f => f.name === 'Action')?.value || 'Unknown';
+            const user = event.eventFields.find(f => f.name === 'UserName')?.value || 'System';
+            const status = event.eventFields.find(f => f.name === 'EnvelopeStatus')?.value || 'Unknown';
+            const message = event.eventFields.find(f => f.name === 'Message')?.value || 'No message';
 
-            labels.push(logTime.toLocaleString());
+            labels.push(logTime.toLocaleDateString());
             eventActions.push(action);
+            
             if (status === 'sent') eventCounts.sent++;
             if (status === 'voided') eventCounts.voided++;
+            if (action.toLowerCase().includes('status')) eventCounts.statusChanges++;
+            
             eventDetails.push({ logTime, action, user, status, message });
           });
 
-          document.getElementById('totalCount').innerText = `Total Events: ${events.length}`;
-          document.getElementById('totalSent').innerText = `Sent Events: ${eventCounts.sent}`;
-          document.getElementById('totalVoided').innerText = `Voided Events: ${eventCounts.voided}`;
+          // Update summary cards
+          document.getElementById('totalCount').innerText = events.length;
+          document.getElementById('totalSent').innerText = eventCounts.sent;
+          document.getElementById('totalStatusChanges').innerText = eventCounts.statusChanges;
 
+          // Populate table
           const tableBody = document.querySelector('#auditTable tbody');
-          eventDetails.forEach(detail => {
+          eventDetails.forEach((detail, index) => {
             const row = document.createElement('tr');
+            row.className = 'hover:bg-gray-50 transition-colors';
             row.innerHTML = `
-              <td class="px-4 py-2 border">${detail.logTime}</td>
-              <td class="px-4 py-2 border">${detail.action}</td>
-              <td class="px-4 py-2 border">${detail.user}</td>
-              <td class="px-4 py-2 border">${detail.status}</td>
-              <td class="px-4 py-2 border">${detail.message}</td>
+              <td class="px-4 py-3 text-sm text-gray-900">${detail.logTime.toLocaleString()}</td>
+              <td class="px-4 py-3 text-sm font-medium text-gray-900">${detail.action}</td>
+              <td class="px-4 py-3 text-sm text-gray-700">${detail.user}</td>
+              <td class="px-4 py-3 text-sm">${getStatusBadge(detail.status)}</td>
+              <td class="px-4 py-3 text-sm text-gray-600">${detail.message}</td>
             `;
             tableBody.appendChild(row);
           });
 
-          // Shared Color Scheme
-          const chartColors = ['#60A5FA', '#34D399', '#FBBF24', '#F87171', '#A78BFA', '#F472B6'];
+          // Enhanced Color Scheme
+          const chartColors = {
+            primary: '#0B3041',
+            secondary: '#118DD1',
+            success: '#196B24',
+            warning: '#E97132',
+            light: ['#0B3041', '#118DD1', '#196B24', '#E97132', '#6b7280', '#8b5cf6']
+          };
 
-          // Line Chart
+          // Enhanced Line Chart - Event Timeline
           const lineChartCtx = document.getElementById('lineChart').getContext('2d');
+          const timelineData = labels.reduce((acc, label) => {
+            acc[label] = (acc[label] || 0) + 1;
+            return acc;
+          }, {});
+
           new Chart(lineChartCtx, {
             type: 'line',
             data: {
-              labels,
+              labels: Object.keys(timelineData),
               datasets: [{
-                label: 'Event Time Trends',
-                data: new Array(labels.length).fill(1),
-                borderColor: chartColors[0],
-                backgroundColor: chartColors[0] + '33',
-                fill: false,
+                label: 'Events per Day',
+                data: Object.values(timelineData),
+                borderColor: chartColors.secondary,
+                backgroundColor: chartColors.secondary + '20',
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: chartColors.secondary,
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 6,
               }],
             },
             options: {
+              responsive: true,
+              maintainAspectRatio: false,
               plugins: {
-                title: { display: true, text: 'Event Time Trends' }
+                legend: { 
+                  display: false 
+                }
               },
               scales: {
-                x: { title: { display: true, text: 'Timestamp' } },
-                y: { title: { display: true, text: 'Events' }, beginAtZero: true }
+                x: { 
+                  grid: { display: false },
+                  ticks: { color: '#6b7280', font: { size: 11 } }
+                },
+                y: { 
+                  beginAtZero: true,
+                  grid: { color: 'rgba(0,0,0,0.05)' },
+                  ticks: { color: '#6b7280', font: { size: 11 } }
+                }
               }
             }
           });
 
-          // Bar Chart
+          // Enhanced Bar Chart - Action Distribution
           const actionCount = eventActions.reduce((acc, act) => {
             acc[act] = (acc[act] || 0) + 1;
             return acc;
           }, {});
+
           const barChartCtx = document.getElementById('barChart').getContext('2d');
           new Chart(barChartCtx, {
-            type: 'bar',
+            type: 'doughnut',
             data: {
               labels: Object.keys(actionCount),
               datasets: [{
                 label: 'Action Counts',
                 data: Object.values(actionCount),
-                backgroundColor: chartColors[1],
+                backgroundColor: chartColors.light,
+                borderWidth: 3,
+                borderColor: '#ffffff',
+                hoverOffset: 10
               }]
             },
             options: {
+              responsive: true,
+              maintainAspectRatio: false,
               plugins: {
-                title: { display: true, text: 'Actions Summary' }
+                legend: { 
+                  position: 'bottom',
+                  labels: {
+                    padding: 15,
+                    usePointStyle: true,
+                    font: { size: 11, weight: '600' },
+                    color: '#374151'
+                  }
+                }
               },
-              scales: {
-                y: { beginAtZero: true }
-              }
+              cutout: '60%'
             }
           });
 
+          // Show content and hide loading
+          document.getElementById('loadingSkeleton').classList.add('hidden');
+          document.getElementById('auditContent').classList.remove('hidden');
+
         })
         .catch(error => {
-          document.body.innerHTML += `<p class="text-red-600 mt-4">Error loading audit log: ${error.message}</p>`;
+          console.error('Error loading audit log:', error);
+          showError(`Failed to load audit log: ${error.message}`);
         });
     });
   </script>
