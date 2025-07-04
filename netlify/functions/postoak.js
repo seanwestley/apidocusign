@@ -35,7 +35,7 @@ exports.handler = async function (event, context) {
 
 
     const sonoraEnvelopes = (response.envelopes || []).filter(envelope =>
-      envelope.emailSubject?.toLowerCase().includes('Post Oak')
+      envelope.emailSubject?.toLowerCase().includes('oak')
     );
 
     return {
