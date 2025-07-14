@@ -36,7 +36,7 @@ exports.handler = async function (event, context) {
 
 
     const sonoraEnvelopes = (response.envelopes || []).filter(envelope =>
-      envelope.emailSubject?.toLowerCase().includes('dynamic')
+      envelope.emailSubject?.toLowerCase().includes('symmetry')
     );
 
     return {
