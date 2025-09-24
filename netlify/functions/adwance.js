@@ -11,7 +11,7 @@ exports.handler = async function (event) {
     const dsApi = new docusign.ApiClient();
     dsApi.setOAuthBasePath(authServer);
 
-    // Auth
+    // Authenticate
     const results = await dsApi.requestJWTUserToken(
       integratorKey,
       userId,
@@ -30,10 +30,11 @@ exports.handler = async function (event) {
 
     const envelopesApi = new docusign.EnvelopesApi(dsApi);
 
-    // Params
-    const { limit, days } = event.queryStringParameters || {};
-    const maxResults = parseInt(limit) || 10; // default 10
-    const daysBack = parseInt(days) || 30; // default 30 days
+    // Query params
+    const { email, limit, days } = event.queryStringParameters || {};
+    const filterEmail = email ? email.toLowerCase() : null;
+    const maxResults = parseInt(limit) || 10;
+    const daysBack = parseInt(days) || 30;
 
     // Fetch envelopes
     const response = await envelopesApi.listStatusChanges(accountId, {
@@ -55,9 +56,13 @@ exports.handler = async function (event) {
             formData[f.name] = f.value;
           });
 
-          // Shortcut fields
           const investorName = formData['Full Name'] || formData['Name'] || null;
-          const investorEmail = formData['Email'] || null;
+          const investorEmail = formData['Email'] ? formData['Email'].toLowerCase() : null;
+
+          // If email param is passed, filter strictly
+          if (filterEmail && investorEmail !== filterEmail) {
+            return null;
+          }
 
           return {
             envelopeId: env.envelopeId,
@@ -72,16 +77,12 @@ exports.handler = async function (event) {
           };
         } catch (err) {
           console.error(`Form data fetch failed for ${env.envelopeId}`, err.message);
-          return {
-            ...env,
-            investorName: null,
-            investorEmail: null,
-            formData: {},
-            fieldError: err.message
-          };
+          return null;
         }
       })
     );
+
+    const filtered = enriched.filter(Boolean);
 
     return {
       statusCode: 200,
@@ -90,8 +91,8 @@ exports.handler = async function (event) {
         'Access-Control-Allow-Headers': 'Content-Type',
       },
       body: JSON.stringify({
-        total: enriched.length,
-        envelopes: enriched
+        total: filtered.length,
+        envelopes: filtered
       }),
     };
   } catch (error) {
