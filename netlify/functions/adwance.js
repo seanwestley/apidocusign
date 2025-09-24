@@ -1,7 +1,7 @@
 // netlify/functions/corecap.js
 const docusign = require('docusign-esign');
 
-exports.handler = async function (event, context) {
+exports.handler = async function (event) {
   try {
     const integratorKey = process.env.DS_CLIENT_ID;
     const userId = process.env.DS_USER_ID;
@@ -30,61 +30,63 @@ exports.handler = async function (event, context) {
 
     const envelopesApi = new docusign.EnvelopesApi(dsApi);
 
-    // Get envelopes from last ~100 days containing "corecap"
+    // Query params
+    const { limit, days } = event.queryStringParameters || {};
+    const maxResults = parseInt(limit) || 20; // default 20
+    const daysBack = parseInt(days) || 30; // default 30 days
+
+    // Fetch envelopes
     const response = await envelopesApi.listStatusChanges(accountId, {
-      fromDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 100).toISOString(),
+      fromDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * daysBack).toISOString(),
+      status: "any"
     });
 
-    const corecapEnvelopes = (response.envelopes || []).filter(env =>
-      env.emailSubject?.toLowerCase().includes('corecap')
-    );
+    const corecapEnvelopes = (response.envelopes || [])
+      .filter(env => env.emailSubject?.toLowerCase().includes('corecap'))
+      .slice(0, maxResults);
 
-    // Enrich with both custom fields + form data
-    const enriched = [];
-    for (const env of corecapEnvelopes) {
-      try {
-        // Envelope-level custom fields
-        const fieldsResponse = await envelopesApi.listCustomFields(accountId, env.envelopeId);
-        const textFields = fieldsResponse?.textCustomFields || [];
-        const customFields = {};
-        textFields.forEach(f => {
-          customFields[f.name] = f.value;
-        });
-
-        // Signer-entered form data
-        let formData = {};
+    // Enrich each envelope with custom fields + form data in parallel
+    const enriched = await Promise.all(
+      corecapEnvelopes.map(async (env) => {
         try {
-          const formResponse = await envelopesApi.getFormData(accountId, env.envelopeId);
-          if (formResponse?.formData) {
-            formData = formResponse.formData.reduce((acc, f) => {
-              acc[f.name] = f.value;
-              return acc;
-            }, {});
-          }
-        } catch (formErr) {
-          console.warn(`No form data for envelope ${env.envelopeId}:`, formErr.message);
-        }
+          const [fieldsResponse, formResponse] = await Promise.all([
+            envelopesApi.listCustomFields(accountId, env.envelopeId),
+            envelopesApi.getFormData(accountId, env.envelopeId)
+          ]);
 
-        enriched.push({
-          envelopeId: env.envelopeId,
-          emailSubject: env.emailSubject,
-          status: env.status,
-          createdDateTime: env.createdDateTime,
-          completedDateTime: env.completedDateTime,
-          sender: env.sender,
-          customFields,
-          formData, // signer-entered fields
-        });
-      } catch (innerErr) {
-        console.error(`Failed to fetch fields for ${env.envelopeId}`, innerErr.message);
-        enriched.push({
-          ...env,
-          customFields: {},
-          formData: {},
-          fieldError: innerErr.message,
-        });
-      }
-    }
+          // Envelope-level custom fields
+          const customFields = {};
+          (fieldsResponse?.textCustomFields || []).forEach(f => {
+            customFields[f.name] = f.value;
+          });
+
+          // Signer form data
+          const formData = {};
+          (formResponse?.formData || []).forEach(f => {
+            formData[f.name] = f.value;
+          });
+
+          return {
+            envelopeId: env.envelopeId,
+            emailSubject: env.emailSubject,
+            status: env.status,
+            createdDateTime: env.createdDateTime,
+            completedDateTime: env.completedDateTime,
+            sender: env.sender,
+            customFields,
+            formData
+          };
+        } catch (err) {
+          console.error(`❌ Envelope ${env.envelopeId} failed:`, err.message);
+          return {
+            ...env,
+            customFields: {},
+            formData: {},
+            fieldError: err.message
+          };
+        }
+      })
+    );
 
     return {
       statusCode: 200,
@@ -92,11 +94,13 @@ exports.handler = async function (event, context) {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Content-Type',
       },
-      body: JSON.stringify(enriched),
+      body: JSON.stringify({
+        total: enriched.length,
+        envelopes: enriched
+      }),
     };
   } catch (error) {
     console.error('❌ Corecap fetch failed:', error.message);
-
     return {
       statusCode: 500,
       headers: {
