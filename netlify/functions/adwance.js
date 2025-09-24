@@ -11,7 +11,7 @@ exports.handler = async function (event) {
     const dsApi = new docusign.ApiClient();
     dsApi.setOAuthBasePath(authServer);
 
-    // Authenticate
+    // Auth
     const results = await dsApi.requestJWTUserToken(
       integratorKey,
       userId,
@@ -30,9 +30,9 @@ exports.handler = async function (event) {
 
     const envelopesApi = new docusign.EnvelopesApi(dsApi);
 
-    // Query params
+    // Params
     const { limit, days } = event.queryStringParameters || {};
-    const maxResults = parseInt(limit) || 20; // default 20
+    const maxResults = parseInt(limit) || 10; // default 10
     const daysBack = parseInt(days) || 30; // default 30 days
 
     // Fetch envelopes
@@ -45,26 +45,19 @@ exports.handler = async function (event) {
       .filter(env => env.emailSubject?.toLowerCase().includes('corecap'))
       .slice(0, maxResults);
 
-    // Enrich each envelope with custom fields + form data in parallel
+    // Enrich with form data
     const enriched = await Promise.all(
       corecapEnvelopes.map(async (env) => {
         try {
-          const [fieldsResponse, formResponse] = await Promise.all([
-            envelopesApi.listCustomFields(accountId, env.envelopeId),
-            envelopesApi.getFormData(accountId, env.envelopeId)
-          ]);
-
-          // Envelope-level custom fields
-          const customFields = {};
-          (fieldsResponse?.textCustomFields || []).forEach(f => {
-            customFields[f.name] = f.value;
-          });
-
-          // Signer form data
+          const formResponse = await envelopesApi.getFormData(accountId, env.envelopeId);
           const formData = {};
           (formResponse?.formData || []).forEach(f => {
             formData[f.name] = f.value;
           });
+
+          // Shortcut fields
+          const investorName = formData['Full Name'] || formData['Name'] || null;
+          const investorEmail = formData['Email'] || null;
 
           return {
             envelopeId: env.envelopeId,
@@ -73,14 +66,16 @@ exports.handler = async function (event) {
             createdDateTime: env.createdDateTime,
             completedDateTime: env.completedDateTime,
             sender: env.sender,
-            customFields,
+            investorName,
+            investorEmail,
             formData
           };
         } catch (err) {
-          console.error(`❌ Envelope ${env.envelopeId} failed:`, err.message);
+          console.error(`Form data fetch failed for ${env.envelopeId}`, err.message);
           return {
             ...env,
-            customFields: {},
+            investorName: null,
+            investorEmail: null,
             formData: {},
             fieldError: err.message
           };
