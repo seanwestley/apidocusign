@@ -30,27 +30,40 @@ exports.handler = async function (event, context) {
 
     const envelopesApi = new docusign.EnvelopesApi(dsApi);
 
-    // Get envelopes from the last ~100 days that contain "corecap" in subject
+    // Get envelopes from last ~100 days containing "corecap"
     const response = await envelopesApi.listStatusChanges(accountId, {
       fromDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 100).toISOString(),
     });
 
-    const corecapEnvelopes = (response.envelopes || []).filter(envelope =>
-      envelope.emailSubject?.toLowerCase().includes('corecap')
+    const corecapEnvelopes = (response.envelopes || []).filter(env =>
+      env.emailSubject?.toLowerCase().includes('corecap')
     );
 
-    // Fetch custom fields for each envelope
+    // Enrich with both custom fields + form data
     const enriched = [];
     for (const env of corecapEnvelopes) {
       try {
+        // Envelope-level custom fields
         const fieldsResponse = await envelopesApi.listCustomFields(accountId, env.envelopeId);
         const textFields = fieldsResponse?.textCustomFields || [];
-
-        // Flatten into key/value map for easier frontend filtering
         const customFields = {};
         textFields.forEach(f => {
           customFields[f.name] = f.value;
         });
+
+        // Signer-entered form data
+        let formData = {};
+        try {
+          const formResponse = await envelopesApi.getFormData(accountId, env.envelopeId);
+          if (formResponse?.formData) {
+            formData = formResponse.formData.reduce((acc, f) => {
+              acc[f.name] = f.value;
+              return acc;
+            }, {});
+          }
+        } catch (formErr) {
+          console.warn(`No form data for envelope ${env.envelopeId}:`, formErr.message);
+        }
 
         enriched.push({
           envelopeId: env.envelopeId,
@@ -60,12 +73,14 @@ exports.handler = async function (event, context) {
           completedDateTime: env.completedDateTime,
           sender: env.sender,
           customFields,
+          formData, // signer-entered fields
         });
       } catch (innerErr) {
-        console.error(`Failed to fetch custom fields for ${env.envelopeId}`, innerErr.message);
+        console.error(`Failed to fetch fields for ${env.envelopeId}`, innerErr.message);
         enriched.push({
           ...env,
           customFields: {},
+          formData: {},
           fieldError: innerErr.message,
         });
       }
