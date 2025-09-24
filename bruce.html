@@ -454,10 +454,14 @@
       const statusCounts = {};
       const fetchPromises = [];
 
-         data.forEach(item => {
+      // Normalize response: API may return { found, envelope } or an array
+      const items = Array.isArray(data) ? data : (data && data.envelope ? [data.envelope] : []);
+
+         items.forEach(item => {
           const subject = item.emailSubject || '—';
           const status = item.status || '—';
-          const updated = item.statusChangedDateTime ? new Date(item.statusChangedDateTime).toLocaleString() : '—';
+          const updatedRaw = item.statusChangedDateTime || item.completedDateTime || item.createdDateTime;
+          const updated = updatedRaw ? new Date(updatedRaw).toLocaleString() : '—';
           const envelopeId = item.envelopeId || '—';
 
           const fetchRecipientAndAmount = Promise.all([
