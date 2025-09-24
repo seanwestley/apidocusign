@@ -1,4 +1,4 @@
-// netlify/functions/corecap.js
+// netlify/functions/corecap-email.js
 const docusign = require('docusign-esign');
 
 exports.handler = async function (event) {
@@ -11,7 +11,7 @@ exports.handler = async function (event) {
     const dsApi = new docusign.ApiClient();
     dsApi.setOAuthBasePath(authServer);
 
-    // Authenticate
+    // Auth
     const results = await dsApi.requestJWTUserToken(
       integratorKey,
       userId,
@@ -24,29 +24,48 @@ exports.handler = async function (event) {
     const userInfo = await dsApi.getUserInfo(accessToken);
     const accountId = userInfo.accounts[0].accountId;
     const basePath = userInfo.accounts[0].baseUri + '/restapi';
-
     dsApi.setBasePath(basePath);
     dsApi.addDefaultHeader('Authorization', 'Bearer ' + accessToken);
 
     const envelopesApi = new docusign.EnvelopesApi(dsApi);
 
-    // Query params
-    const { email, limit, days } = event.queryStringParameters || {};
-    const filterEmail = email ? email.toLowerCase() : null;
-    const maxResults = parseInt(limit) || 10;
-    const daysBack = parseInt(days) || 30;
+    // Params
+    const { email, days } = event.queryStringParameters || {};
+    if (!email) {
+      return { statusCode: 400, body: JSON.stringify({ error: "email param required" }) };
+    }
+    const filterEmail = email.toLowerCase();
+    const daysBack = parseInt(days) || 90; // default 90 days back
 
-    // Fetch envelopes
-    const response = await envelopesApi.listStatusChanges(accountId, {
-      fromDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * daysBack).toISOString(),
-      status: "any"
-    });
+    // Function to loop through all pages
+    async function fetchAllEnvelopes(uri = null, collected = []) {
+      let response;
+      if (uri) {
+        response = await dsApi.callApi(uri, 'GET', {}, null, { 'Authorization': 'Bearer ' + accessToken }, null);
+        response = response.body;
+      } else {
+        response = await envelopesApi.listStatusChanges(accountId, {
+          fromDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * daysBack).toISOString(),
+          status: "any"
+        });
+      }
 
-    const corecapEnvelopes = (response.envelopes || [])
-      .filter(env => env.emailSubject?.toLowerCase().includes('corecap'))
-      .slice(0, maxResults);
+      collected = collected.concat(response.envelopes || []);
+      if (response.nextUri) {
+        return fetchAllEnvelopes(response.nextUri, collected);
+      } else {
+        return collected;
+      }
+    }
 
-    // Enrich with form data
+    // Get all envelopes
+    const allEnvelopes = await fetchAllEnvelopes();
+
+    // Filter Corecap + enrich
+    const corecapEnvelopes = allEnvelopes.filter(env =>
+      env.emailSubject?.toLowerCase().includes('corecap')
+    );
+
     const enriched = await Promise.all(
       corecapEnvelopes.map(async (env) => {
         try {
@@ -56,13 +75,8 @@ exports.handler = async function (event) {
             formData[f.name] = f.value;
           });
 
-          const investorName = formData['Full Name'] || formData['Name'] || null;
           const investorEmail = formData['Email'] ? formData['Email'].toLowerCase() : null;
-
-          // If email param is passed, filter strictly
-          if (filterEmail && investorEmail !== filterEmail) {
-            return null;
-          }
+          if (investorEmail !== filterEmail) return null;
 
           return {
             envelopeId: env.envelopeId,
@@ -70,13 +84,12 @@ exports.handler = async function (event) {
             status: env.status,
             createdDateTime: env.createdDateTime,
             completedDateTime: env.completedDateTime,
-            sender: env.sender,
-            investorName,
+            investorName: formData['Full Name'] || formData['Name'] || null,
             investorEmail,
             formData
           };
         } catch (err) {
-          console.error(`Form data fetch failed for ${env.envelopeId}`, err.message);
+          console.error(`FormData failed for ${env.envelopeId}`, err.message);
           return null;
         }
       })
@@ -86,24 +99,10 @@ exports.handler = async function (event) {
 
     return {
       statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-      },
-      body: JSON.stringify({
-        total: filtered.length,
-        envelopes: filtered
-      }),
+      body: JSON.stringify({ total: filtered.length, envelopes: filtered })
     };
-  } catch (error) {
-    console.error('❌ Corecap fetch failed:', error.message);
-    return {
-      statusCode: 500,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-      },
-      body: JSON.stringify({ message: error.message, stack: error.stack }),
-    };
+  } catch (err) {
+    console.error('❌ Error:', err.message);
+    return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
   }
 };
