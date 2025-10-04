@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Solomon | Client Dashboard</title>
+  <title>Romain Financial | Client Dashboard</title>
 
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -25,8 +25,8 @@
 
   <style>
     :root {
-      --primary-blue: #0B3041;
-      --secondary-blue: #118DD1;
+      --primary-green: #16a34a;
+      --secondary-green: #22c55e;
       --success-green: #196B24;
       --warning-orange: #E97132;
       --danger-red: #ef4444;
@@ -50,9 +50,9 @@
       font-weight: 700;
     }
 
-    /* Updated header gradient for Solomon Financial */
+    /* Updated header gradient for Romain Financial */
     .hero-gradient {
-      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+      background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
       position: relative;
       overflow: hidden;
     }
@@ -81,9 +81,9 @@
       width: 100%;
     }
 
-    /* Updated status card gradient for Solomon Financial */
+    /* Updated status card gradient for Romain Financial */
     .status-card {
-      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+      background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       transform: translateY(0);
       position: relative;
@@ -107,12 +107,12 @@
 
     .status-card:hover {
       transform: translateY(-8px) scale(1.02);
-      box-shadow: 0 25px 50px -12px rgba(11, 48, 65, 0.4);
+      box-shadow: 0 25px 50px -12px rgba(22, 163, 74, 0.4);
     }
 
-    /* Updated button style for Solomon Financial */
+    /* Updated button style for Romain Financial */
     .btn-primary-custom {
-      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+      background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
       color: white;
       border: none;
       padding: 10px 20px;
@@ -128,7 +128,7 @@
 
     .btn-primary-custom:hover {
       transform: translateY(-2px);
-      box-shadow: 0 15px 30px rgba(11, 48, 65, 0.4);
+      box-shadow: 0 15px 30px rgba(22, 163, 74, 0.4);
       color: white;
       text-decoration: none;
     }
@@ -144,8 +144,8 @@
 
     .dataTables_wrapper .dataTables_filter input:focus,
     .dataTables_wrapper .dataTables_length select:focus {
-      border-color: var(--primary-blue);
-      box-shadow: 0 0 0 4px rgba(11, 48, 65, 0.1);
+      border-color: var(--primary-green);
+      box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1);
       outline: none;
     }
   .custom-table select.form-select.form-select-sm {
@@ -227,8 +227,8 @@
     div#dashboard .pagination li a {
       box-shadow: none !important;
       background: transparent;
-      border: 2px solid var(--primary-blue) !important;
-      color: var(--primary-blue) !important;
+      border: 2px solid var(--primary-green) !important;
+      color: var(--primary-green) !important;
       border-radius: 12px;
       margin: 0 4px;
       padding: 10px 16px;
@@ -237,22 +237,22 @@
     }
 
     div#dashboard .pagination li.active a {
-      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
-      border: 2px solid var(--primary-blue) !important;
+      background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
+      border: 2px solid var(--primary-green) !important;
       color: #fff !important;
       transform: scale(1.05);
     }
 
     div#dashboard .pagination li a:hover {
-      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%) !important;
+      background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%) !important;
       color: #fff !important;
       transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(11, 48, 65, 0.3);
+      box-shadow: 0 8px 25px rgba(22, 163, 74, 0.3);
     }
 
     /* Enhanced table styling */
     th.sorting, th.sorting_asc, th.sorting_desc {
-      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%) !important;
+      background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%) !important;
       color: white !important;
       font-weight: 700 !important;
       padding: 18px 12px !important;
@@ -273,7 +273,7 @@
     }
 
     .table tbody tr:hover {
-      background-color: rgba(11, 48, 65, 0.05);
+      background-color: rgba(22, 163, 74, 0.05);
       transform: scale(1.01);
     }
 
@@ -311,12 +311,12 @@
     }
 
     .status-sent {
-      background: var(--secondary-blue);
+      background: var(--secondary-green);
       color: white;
     }
 
     .status-default {
-      background: var(--primary-blue);
+      background: var(--primary-green);
       color: white;
     }
 
@@ -331,7 +331,7 @@
     }
 
     .chart-title {
-      color: var(--primary-blue);
+      color: var(--primary-green);
       font-weight: 800;
       font-size: 18px;
       margin-bottom: 20px;
@@ -362,12 +362,10 @@
   <div class="container mx-auto px-6">
     <div class="flex items-center justify-center">
       <div class="text-center">
-        <h1 class="text-3xl font-bold">Solomon Financial | KPC Private Funds</h1>
-        <p class="text-white/80 mt-1">Brad, John & Bruce | Client Onboarding Status</p>
+        <h1 class="text-3xl font-bold">Romain Financial | Client Dashboard</h1>
+        <p class="text-white/80 mt-1">Rob | Client Onboarding Status</p>
         <div class="mt-3 flex justify-center space-x-4 text-sm">
-          <span class="bg-white/20 px-3 py-1 rounded-full">Brad Clark</span>
-          <span class="bg-white/20 px-3 py-1 rounded-full">John Rafferty</span>
-          <span class="bg-white/20 px-3 py-1 rounded-full">Bruce Maginn</span>
+          <span class="bg-white/20 px-3 py-1 rounded-full">Rob</span>
         </div>
       </div>
     </div>
@@ -453,17 +451,17 @@
     }
   }
 
-  fetch('https://docusign-portal.netlify.app/.netlify/functions/solomon')
+  fetch('https://docusign-portal.netlify.app/.netlify/functions/romain')
     .then(res => res.json())
     .then(data => {
       const tbody = document.querySelector('#envelopes tbody');
       const statusCounts = {};
       const fetchPromises = [];
 
-      // Handle Solomon Financial response structure
+      // Handle Romain Financial response structure
       const items = data.envelopes || [];
-      const subFirmColor = data.color || '#1e40af';
-      const subFirmName = data.subFirm || 'Solomon Financial';
+      const subFirmColor = data.color || '#16a34a';
+      const subFirmName = data.subFirm || 'Romain Financial';
       const advisors = data.advisors || [];
 
          items.forEach(item => {
@@ -595,8 +593,8 @@
       'In Progress': '#f59e0b',
       voided: '#6b7280',
       deleted: '#ef4444',
-      sent: '#1e4882',
-      default: '#1e4882'
+      sent: '#16a34a',
+      default: '#16a34a'
     };
 
     // Premium Doughnut Chart
