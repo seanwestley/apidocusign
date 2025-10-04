@@ -50,9 +50,9 @@
       font-weight: 700;
     }
 
-    /* Updated header gradient to match envelope view */
+    /* Updated header gradient for Solomon Financial */
     .hero-gradient {
-      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
       position: relative;
       overflow: hidden;
     }
@@ -81,9 +81,9 @@
       width: 100%;
     }
 
-    /* Updated status card gradient */
+    /* Updated status card gradient for Solomon Financial */
     .status-card {
-      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       transform: translateY(0);
       position: relative;
@@ -110,9 +110,9 @@
       box-shadow: 0 25px 50px -12px rgba(11, 48, 65, 0.4);
     }
 
-    /* Updated button style */
+    /* Updated button style for Solomon Financial */
     .btn-primary-custom {
-      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
       color: white;
       border: none;
       padding: 10px 20px;
@@ -362,8 +362,13 @@
   <div class="container mx-auto px-6">
     <div class="flex items-center justify-center">
       <div class="text-center">
-        <h1 class="text-3xl font-bold">Bruce | KPC Private Funds</h1>
-        <p class="text-white/80 mt-1">Client Onboarding Status</p>
+        <h1 class="text-3xl font-bold">Solomon Financial | KPC Private Funds</h1>
+        <p class="text-white/80 mt-1">Brad, John & Bruce | Client Onboarding Status</p>
+        <div class="mt-3 flex justify-center space-x-4 text-sm">
+          <span class="bg-white/20 px-3 py-1 rounded-full">Brad Clark</span>
+          <span class="bg-white/20 px-3 py-1 rounded-full">John Rafferty</span>
+          <span class="bg-white/20 px-3 py-1 rounded-full">Bruce Maginn</span>
+        </div>
       </div>
     </div>
   </div>
@@ -447,15 +452,18 @@
     }
   }
 
-  fetch('https://docusign-portal.netlify.app/.netlify/functions/bruce')
+  fetch('https://docusign-portal.netlify.app/.netlify/functions/solomon')
     .then(res => res.json())
     .then(data => {
       const tbody = document.querySelector('#envelopes tbody');
       const statusCounts = {};
       const fetchPromises = [];
 
-      // Normalize response: API may return { found, envelope } or an array
-      const items = Array.isArray(data) ? data : (data && data.envelope ? [data.envelope] : []);
+      // Handle Solomon Financial response structure
+      const items = data.envelopes || [];
+      const subFirmColor = data.color || '#1e40af';
+      const subFirmName = data.subFirm || 'Solomon Financial';
+      const advisors = data.advisors || [];
 
          items.forEach(item => {
           const subject = item.emailSubject || '—';
@@ -477,6 +485,13 @@
           .then(([recipientData, investedAmount]) => {
             const nextSigner = recipientData.signers?.find(signer => signer.status !== "completed")?.name || '—';
             statusCounts[status] = (statusCounts[status] || 0) + 1;
+
+            // Get associated advisors for this envelope
+            const associatedAdvisors = item.associatedAdvisors || [];
+            const advisorNames = associatedAdvisors.map(email => {
+              const name = email.split('@')[0].replace('.', ' ').toUpperCase();
+              return name;
+            }).join(', ');
 
             // Clean status badge without icons
             const getStatusBadge = (status) => {
@@ -509,6 +524,11 @@
                 <td class="text-center font-medium text-gray-700">${nextSigner}</td>
                 <td class="text-center text-gray-600 font-medium">${updated}</td>
                 <td class="text-center">${viewLink}</td>
+              </tr>
+              <tr class="bg-blue-50 border-l-4" style="border-left-color: ${subFirmColor};">
+                <td colspan="6" class="text-sm text-gray-600 py-2 pl-4">
+                  <strong>Associated Advisors:</strong> ${advisorNames || 'N/A'}
+                </td>
               </tr>
             `);
           })
