@@ -144,8 +144,7 @@ exports.handler = async function (event, context) {
     // Search for envelopes - use broader search for sub-firm level
     const response = await envelopesApi.listStatusChanges(accountId, {
       fromDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString(), // 30 days
-      status: "completed", // Only search completed envelopes
-      searchText: subFirmName.toLowerCase() // Search by sub-firm name in subject
+      status: "completed" // Only search completed envelopes - don't filter by searchText here
     });
 
     // Process envelopes in parallel with a limit to avoid overwhelming the API
@@ -205,13 +204,14 @@ async function checkEnvelopeForSubFirm(envelopesApi, accountId, env, subFirmEmai
       formData[f.name] = f.value;
     });
 
-    // Check if any of the sub-firm emails appear in the form data
+    // Check if any of the sub-firm emails appear in the form data (like bruce.js)
     const hasSubFirmEmail = subFirmEmails.some(email => 
       Object.values(formData).some(v => v && v.toLowerCase().includes(email.toLowerCase()))
     );
 
-    // Also check if sub-firm name appears in subject line (for CoreCap firm-wide access)
-    const hasSubFirmInSubject = env.emailSubject?.toLowerCase().includes(subFirmName.toLowerCase());
+    // For CoreCap, also check if "corecap" appears in subject line (firm-wide access)
+    const hasSubFirmInSubject = subFirmName === 'CoreCap' && 
+      env.emailSubject?.toLowerCase().includes('corecap');
 
     if (hasSubFirmEmail || hasSubFirmInSubject) {
       // Determine which advisor(s) are associated with this envelope
