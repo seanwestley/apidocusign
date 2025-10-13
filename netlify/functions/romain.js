@@ -104,8 +104,8 @@ exports.handler = async function (event, context) {
 
     // Search for envelopes - use broader search for sub-firm level
     const response = await envelopesApi.listStatusChanges(accountId, {
-      fromDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString(), // 30 days
-      status: "completed" // Only search completed envelopes - don't filter by searchText here
+      fromDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 90).toISOString(), // 90 days instead of 30
+      // Remove status filter to get all statuses, not just completed
     });
 
     // Process envelopes in parallel with a limit to avoid overwhelming the API

@@ -143,8 +143,8 @@ exports.handler = async function (event, context) {
 
     // Search for envelopes - use broader search for sub-firm level
     const response = await envelopesApi.listStatusChanges(accountId, {
-      fromDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString(), // 30 days
-      status: "completed" // Only search completed envelopes - don't filter by searchText here
+      fromDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 90).toISOString(), // 90 days instead of 30
+      // Remove status filter to get all statuses, not just completed
     });
 
     // Process envelopes in parallel with a limit to avoid overwhelming the API
@@ -198,13 +198,34 @@ exports.handler = async function (event, context) {
 
 async function checkEnvelopeForSubFirm(envelopesApi, accountId, env, subFirmEmails, subFirmName) {
   try {
+    // First check if any advisor emails appear in the subject line (faster check)
+    const hasEmailInSubject = subFirmEmails.some(email => 
+      env.emailSubject?.toLowerCase().includes(email.toLowerCase())
+    );
+
+    if (hasEmailInSubject) {
+      return {
+        envelopeId: env.envelopeId,
+        emailSubject: env.emailSubject,
+        status: env.status,
+        createdDateTime: env.createdDateTime,
+        completedDateTime: env.completedDateTime,
+        statusChangedDateTime: env.statusChangedDateTime,
+        associatedAdvisors: subFirmEmails.filter(email => 
+          env.emailSubject?.toLowerCase().includes(email.toLowerCase())
+        ),
+        subFirm: subFirmName
+      };
+    }
+
+    // If not found in subject, check form data
     const formResponse = await envelopesApi.getFormData(accountId, env.envelopeId);
     const formData = {};
     (formResponse?.formData || []).forEach(f => {
       formData[f.name] = f.value;
     });
 
-    // Check if any of the sub-firm emails appear in the form data (like bruce.js)
+    // Check if any of the sub-firm emails appear in the form data
     const hasSubFirmEmail = subFirmEmails.some(email => 
       Object.values(formData).some(v => v && v.toLowerCase().includes(email.toLowerCase()))
     );
