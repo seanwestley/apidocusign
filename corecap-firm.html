@@ -310,6 +310,11 @@
       color: white;
     }
 
+    .status-declined {
+      background: #8a1a1a;
+      color: white;
+    }
+
     .status-sent {
       background: var(--secondary-red);
       color: white;
@@ -486,7 +491,14 @@
               .catch(() => '—')
           ])
           .then(([recipientData, investedAmount]) => {
-            const nextSigner = recipientData.signers?.find(signer => signer.status !== "completed")?.name || '—';
+            let nextSigner = recipientData.signers?.find(signer => signer.status !== "completed")?.name || '—';
+            const statusLowerRow = (status || '').toLowerCase();
+            if (statusLowerRow === 'declined') {
+              const declinedBy = recipientData.signers?.find(s => (s.status || '').toLowerCase() === 'declined')?.name;
+              nextSigner = declinedBy ? `Declined By ${declinedBy}` : 'Declined';
+            } else if (statusLowerRow === 'voided') {
+              nextSigner = '—';
+            }
             statusCounts[status] = (statusCounts[status] || 0) + 1;
 
             // Get associated advisors for this envelope
@@ -498,7 +510,7 @@
 
             // Clean status badge without icons
             const getStatusBadge = (status) => {
-              const statusLower = status.toLowerCase();
+              const statusLower = (status || '').toLowerCase();
               let badgeClass = 'status-default';
               
               if (statusLower === 'completed') {
@@ -511,9 +523,12 @@
                 badgeClass = 'status-deleted';
               } else if (statusLower === 'sent') {
                 badgeClass = 'status-sent';
+              } else if (statusLower === 'declined') {
+                badgeClass = 'status-declined';
               }
               
-              return `<span class="status-badge ${badgeClass}">${status}</span>`;
+              const label = (status || '').toString().replace(/\b\w/g, c => c.toUpperCase());
+              return `<span class="status-badge ${badgeClass}">${label}</span>`;
             };
 
             const statusBadge = getStatusBadge(status);

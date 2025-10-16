@@ -310,6 +310,11 @@
       color: white;
     }
 
+    .status-declined {
+      background: #b91c1c; /* distinct red for Declined */
+      color: white;
+    }
+
     .status-sent {
       background: var(--secondary-blue);
       color: white;
@@ -484,7 +489,7 @@
               .catch(() => '—')
           ])
           .then(([recipientData, investedAmount]) => {
-            const nextSigner = recipientData.signers?.find(signer => signer.status !== "completed")?.name || '—';
+            let nextSigner = recipientData.signers?.find(signer => signer.status !== "completed")?.name || '—';
             statusCounts[status] = (statusCounts[status] || 0) + 1;
 
             // Get associated advisors for this envelope
@@ -496,7 +501,7 @@
 
             // Clean status badge without icons
             const getStatusBadge = (status) => {
-              const statusLower = status.toLowerCase();
+              const statusLower = (status || '').toLowerCase();
               let badgeClass = 'status-default';
               
               if (statusLower === 'completed') {
@@ -509,10 +514,22 @@
                 badgeClass = 'status-deleted';
               } else if (statusLower === 'sent') {
                 badgeClass = 'status-sent';
+              } else if (statusLower === 'declined') {
+                badgeClass = 'status-declined';
               }
               
-              return `<span class="status-badge ${badgeClass}">${status}</span>`;
+              const label = (status || '').toString().replace(/\b\w/g, c => c.toUpperCase());
+              return `<span class="status-badge ${badgeClass}">${label}</span>`;
             };
+
+            // Adjust nextSigner text for declined/voided
+            const statusLowerRow = (status || '').toLowerCase();
+            if (statusLowerRow === 'declined') {
+              const declinedBy = recipientData.signers?.find(s => (s.status || '').toLowerCase() === 'declined')?.name;
+              nextSigner = declinedBy ? `Declined By ${declinedBy}` : 'Declined';
+            } else if (statusLowerRow === 'voided') {
+              nextSigner = '—';
+            }
 
             const statusBadge = getStatusBadge(status);
             const viewLink = `<a href="/viewEnvelope.html?id=${envelopeId}" class="btn-primary-custom">View</a>`;

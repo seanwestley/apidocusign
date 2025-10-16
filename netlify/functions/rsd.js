@@ -102,7 +102,10 @@ exports.handler = async function (event, context) {
     });
 
     // Process envelopes in parallel with a limit to avoid overwhelming the API
-    const envelopes = response.envelopes || [];
+    const envelopes = (response.envelopes || []).filter(env => {
+      const subj = (env.emailSubject || '').toLowerCase();
+      return !(subj.includes('test') || subj.includes('dummy') || subj.includes('sandbox'));
+    });
     const batchSize = 5; // Process 5 envelopes at a time
     const matchingEnvelopes = [];
     
@@ -152,14 +155,10 @@ exports.handler = async function (event, context) {
 
 async function checkEnvelopeForRSD(envelopesApi, accountId, env) {
   try {
-    // Get envelope details to check CC recipients
-    const envelopeDetails = await envelopesApi.getEnvelope(accountId, env.envelopeId);
-    
-    // Check if Jon Knowlton is CC'd
-    const ccRecipients = envelopeDetails.ccRecipients || [];
-    const hasJonKnowltonCC = ccRecipients.some(cc => 
-      cc.email?.toLowerCase().includes(RSD_CONFIG.ccEmail.toLowerCase())
-    );
+    // Use recipients list to find CCs accurately
+    const recipients = await envelopesApi.listRecipients(accountId, env.envelopeId);
+    const ccRecipients = (recipients.carbonCopies || []).map(cc => cc.email).filter(Boolean);
+    const hasJonKnowltonCC = ccRecipients.some(email => (email || '').toLowerCase() === RSD_CONFIG.ccEmail.toLowerCase());
 
     if (hasJonKnowltonCC) {
       return {
@@ -171,7 +170,7 @@ async function checkEnvelopeForRSD(envelopesApi, accountId, env) {
         statusChangedDateTime: env.statusChangedDateTime,
         associatedAdvisors: [RSD_CONFIG.ccEmail],
         subFirm: RSD_CONFIG.subFirm,
-        ccRecipients: ccRecipients.map(cc => cc.email).filter(Boolean)
+        ccRecipients
       };
     }
   } catch (err) {

@@ -137,7 +137,10 @@ exports.handler = async function (event, context) {
     });
 
     // Process envelopes in parallel with a limit to avoid overwhelming the API
-    const envelopes = response.envelopes || [];
+    const envelopes = (response.envelopes || []).filter(env => {
+      const subj = (env.emailSubject || '').toLowerCase();
+      return !(subj.includes('test') || subj.includes('dummy') || subj.includes('sandbox'));
+    });
     const batchSize = 5; // Process 5 envelopes at a time
     const matchingEnvelopes = [];
     

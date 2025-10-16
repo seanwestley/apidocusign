@@ -110,7 +110,11 @@ exports.handler = async function (event, context) {
     });
 
     // Process envelopes in parallel with a limit to avoid overwhelming the API
-    const envelopes = response.envelopes || [];
+    // Exclude obvious test envelopes by subject
+    const envelopes = (response.envelopes || []).filter(env => {
+      const subj = (env.emailSubject || '').toLowerCase();
+      return !(subj.includes('test') || subj.includes('dummy') || subj.includes('sandbox'));
+    });
     const batchSize = 5; // Process 5 envelopes at a time
     const matchingEnvelopes = [];
     
@@ -171,11 +175,27 @@ async function checkEnvelopeForSubFirm(envelopesApi, accountId, env, subFirmEmai
       Object.values(formData).some(v => v && v.toLowerCase().includes(email.toLowerCase()))
     );
 
-    if (hasSubFirmEmail) {
+    // If not in form data, also check recipients (signers, CCs, etc.)
+    let hasSubFirmInRecipients = false;
+    let associatedAdvisorsFromRecipients = [];
+    try {
+      const recipients = await envelopesApi.listRecipients(accountId, env.envelopeId);
+      const recipientEmails = [];
+      ['signers','carbonCopies','certifiedDeliveries','agents','editors','intermediaries','inPersonSigners'].forEach(key => {
+        (recipients[key] || []).forEach(r => recipientEmails.push((r.email || '').toLowerCase()));
+      });
+      associatedAdvisorsFromRecipients = subFirmEmails.filter(e => recipientEmails.includes(e.toLowerCase()));
+      hasSubFirmInRecipients = associatedAdvisorsFromRecipients.length > 0;
+    } catch (e) {
+      // ignore recipient lookup errors per envelope
+    }
+
+    if (hasSubFirmEmail || hasSubFirmInRecipients) {
       // Determine which advisor(s) are associated with this envelope
-      const associatedAdvisors = subFirmEmails.filter(email => 
-        Object.values(formData).some(v => v && v.toLowerCase().includes(email.toLowerCase()))
-      );
+      const associatedAdvisors = Array.from(new Set([
+        ...subFirmEmails.filter(email => Object.values(formData).some(v => v && v.toLowerCase().includes(email.toLowerCase()))),
+        ...associatedAdvisorsFromRecipients
+      ]));
 
       return {
         envelopeId: env.envelopeId,
