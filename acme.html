@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Rising Star Distributors | RSD Dashboard</title>
+  <title>KPC Demo Dashboard | ACME</title>
 
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -25,8 +25,8 @@
 
   <style>
     :root {
-      --primary-blue: #0C8BEB; /* KPC Cyan-Blue 500 */
-      --secondary-blue: #006ECD; /* KPC Cyan-Blue 600 */
+      --primary-blue: #4894E9; /* KPC Blue 500 */
+      --secondary-blue: #3378D0; /* KPC Blue 600 */
       --success-green: #196B24;
       --warning-orange: #E97132;
       --danger-red: #ef4444;
@@ -50,9 +50,9 @@
       font-weight: 700;
     }
 
-    /* Updated header gradient for RSD - KPC Cyan-Blue */
+    /* KPC Blue gradient header */
     .hero-gradient {
-      background: linear-gradient(135deg, #0C8BEB 0%, #006ECD 100%);
+      background: linear-gradient(135deg, #4894E9 0%, #3378D0 100%);
       position: relative;
       overflow: hidden;
     }
@@ -81,9 +81,9 @@
       width: 100%;
     }
 
-    /* Updated status card gradient for RSD - KPC Cyan-Blue */
+    /* KPC Blue status card gradient */
     .status-card {
-      background: linear-gradient(135deg, #0C8BEB 0%, #006ECD 100%);
+      background: linear-gradient(135deg, #4894E9 0%, #3378D0 100%);
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       transform: translateY(0);
       position: relative;
@@ -107,12 +107,12 @@
 
     .status-card:hover {
       transform: translateY(-8px) scale(1.02);
-      box-shadow: 0 25px 50px -12px rgba(12, 139, 235, 0.4);
+      box-shadow: 0 25px 50px -12px rgba(72, 148, 233, 0.4);
     }
 
-    /* Updated button style for RSD - KPC Cyan-Blue */
+    /* KPC Blue button style */
     .btn-primary-custom {
-      background: linear-gradient(135deg, #0C8BEB 0%, #006ECD 100%);
+      background: linear-gradient(135deg, #4894E9 0%, #3378D0 100%);
       color: white;
       border: none;
       padding: 10px 20px;
@@ -128,7 +128,7 @@
 
     .btn-primary-custom:hover {
       transform: translateY(-2px);
-      box-shadow: 0 15px 30px rgba(12, 139, 235, 0.4);
+      box-shadow: 0 15px 30px rgba(72, 148, 233, 0.4);
       color: white;
       text-decoration: none;
     }
@@ -145,7 +145,7 @@
     .dataTables_wrapper .dataTables_filter input:focus,
     .dataTables_wrapper .dataTables_length select:focus {
       border-color: var(--primary-blue);
-      box-shadow: 0 0 0 4px rgba(12, 139, 235, 0.1);
+      box-shadow: 0 0 0 4px rgba(72, 148, 233, 0.1);
       outline: none;
     }
   .custom-table select.form-select.form-select-sm {
@@ -237,22 +237,22 @@
     }
 
     div#dashboard .pagination li.active a {
-      background: linear-gradient(135deg, #0C8BEB 0%, #006ECD 100%);
+      background: linear-gradient(135deg, #4894E9 0%, #3378D0 100%);
       border: 2px solid var(--primary-blue) !important;
       color: #fff !important;
       transform: scale(1.05);
     }
 
     div#dashboard .pagination li a:hover {
-      background: linear-gradient(135deg, #0C8BEB 0%, #006ECD 100%) !important;
+      background: linear-gradient(135deg, #4894E9 0%, #3378D0 100%) !important;
       color: #fff !important;
       transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(12, 139, 235, 0.3);
+      box-shadow: 0 8px 25px rgba(72, 148, 233, 0.3);
     }
 
     /* Enhanced table styling */
     th.sorting, th.sorting_asc, th.sorting_desc {
-      background: linear-gradient(135deg, #0C8BEB 0%, #006ECD 100%) !important;
+      background: linear-gradient(135deg, #4894E9 0%, #3378D0 100%) !important;
       color: white !important;
       font-weight: 700 !important;
       padding: 18px 12px !important;
@@ -273,7 +273,7 @@
     }
 
     .table tbody tr:hover {
-      background-color: rgba(12, 139, 235, 0.05);
+      background-color: rgba(72, 148, 233, 0.05);
       transform: scale(1.01);
     }
 
@@ -310,13 +310,13 @@
       color: white;
     }
 
-    .status-declined {
-      background: #6b21a8; /* darker purple for declined */
+    .status-sent {
+      background: var(--secondary-blue);
       color: white;
     }
 
-    .status-sent {
-      background: var(--secondary-blue);
+    .status-declined {
+      background: #6b21a8;
       color: white;
     }
 
@@ -362,13 +362,13 @@
   </style>
 </head>
 <body class="text-gray-800">
-  <!-- Header with Back Button - Matching the envelope view style -->
+  <!-- Header -->
   <div class="hero-gradient text-white py-6 shadow-lg">
   <div class="container mx-auto px-6">
     <div class="flex items-center justify-center">
       <div class="text-center">
-        <h1 class="text-3xl font-bold">Rising Star Distributors | KPC Dashboard</h1>
-        <p class="text-white/80 mt-1">Client Onboarding Status</p>
+        <h1 class="text-3xl font-bold">KPC Demo Dashboard</h1>
+        <p class="text-white/80 mt-1">ACME Envelopes | Client Onboarding Status</p>
       </div>
     </div>
   </div>
@@ -430,7 +430,6 @@
                 <th>Amount</th>
                 <th>Status</th>
                 <th>Next Signer</th>
-                <th>CC Recipients</th>
                 <th>Updated</th>
                 <th>Detail</th>
               </tr>
@@ -453,18 +452,17 @@
     }
   }
 
-  fetch('https://docusign-portal.netlify.app/.netlify/functions/rsd')
+  fetch('https://docusign-portal.netlify.app/.netlify/functions/acme')
     .then(res => res.json())
     .then(data => {
       const tbody = document.querySelector('#envelopes tbody');
       const statusCounts = {};
       const fetchPromises = [];
 
-      // Handle RSD response structure
+      // Handle ACME response structure
       const items = data.envelopes || [];
-      const subFirmColor = data.color || '#7c3aed';
-      const subFirmName = data.subFirm || 'Rising Star Distributors';
-      const advisors = data.advisors || [];
+      const subFirmColor = data.color || '#4894E9';
+      const subFirmName = data.subFirm || 'ACME';
 
          items.forEach(item => {
           const subject = item.emailSubject || '—';
@@ -485,18 +483,7 @@
           ])
           .then(([recipientData, investedAmount]) => {
             let nextSigner = recipientData.signers?.find(signer => signer.status !== "completed")?.name || '—';
-            const statusLowerRow = (status || '').toLowerCase();
-            if (statusLowerRow === 'declined') {
-              const declinedBy = recipientData.signers?.find(s => (s.status || '').toLowerCase() === 'declined')?.name;
-              nextSigner = declinedBy ? `Declined By ${declinedBy}` : 'Declined';
-            } else if (statusLowerRow === 'voided') {
-              nextSigner = '—';
-            }
             statusCounts[status] = (statusCounts[status] || 0) + 1;
-
-            // Get CC recipients for this envelope
-            const ccRecipients = item.ccRecipients || [];
-            const ccList = ccRecipients.join(', ');
 
             // Clean status badge without icons
             const getStatusBadge = (status) => {
@@ -521,6 +508,15 @@
               return `<span class="status-badge ${badgeClass}">${label}</span>`;
             };
 
+            // Adjust nextSigner text for declined/voided
+            const statusLowerRow = (status || '').toLowerCase();
+            if (statusLowerRow === 'declined') {
+              const declinedBy = recipientData.signers?.find(s => (s.status || '').toLowerCase() === 'declined')?.name;
+              nextSigner = declinedBy ? `Declined By ${declinedBy}` : 'Declined';
+            } else if (statusLowerRow === 'voided') {
+              nextSigner = '—';
+            }
+
             const statusBadge = getStatusBadge(status);
             const viewLink = `<a href="/viewEnvelope.html?id=${envelopeId}" class="btn-primary-custom">View</a>`;
 
@@ -530,11 +526,6 @@
                 <td class="text-center investment-amount">$${investedAmount}</td>
                 <td class="text-center">${statusBadge}</td>
                 <td class="text-center font-medium text-gray-700">${nextSigner}</td>
-                <td class="text-center">
-                  <span class="inline-block px-2 py-1 text-xs font-semibold rounded-full" style="background-color: ${subFirmColor}20; color: ${subFirmColor};">
-                    ${ccList || 'N/A'}
-                  </span>
-                </td>
                 <td class="text-center text-gray-600 font-medium">${updated}</td>
                 <td class="text-center">${viewLink}</td>
               </tr>
@@ -544,7 +535,7 @@
             console.error('Error fetching data:', err);
             tbody.insertAdjacentHTML('beforeend', `
               <tr>
-                <td colspan="7" class="text-center text-red-600 py-8 font-semibold">
+                <td colspan="6" class="text-center text-red-600 py-8 font-semibold">
                   Error loading envelope data
                 </td>
               </tr>
@@ -559,15 +550,14 @@
         $('#envelopes').DataTable({
          pageLength: 100,
           autoWidth: false,
-          order: [[5, 'desc']],
+          order: [[4, 'desc']],
           columnDefs: [
-            { targets: 0, width: '30%' },
-            { targets: 1, width: '12%' },
-            { targets: 2, width: '12%' },
-            { targets: 3, width: '12%' },
-            { targets: 4, width: '15%' },
-            { targets: 5, width: '12%' },
-            { targets: 6, width: '7%' },
+            { targets: 0, width: '35%' },
+            { targets: 1, width: '15%' },
+            { targets: 2, width: '15%' },
+            { targets: 3, width: '15%' },
+            { targets: 4, width: '12%' },
+            { targets: 5, width: '8%' },
           ],
           language: {
             search: "Search envelopes:",
@@ -602,9 +592,9 @@
       'In Progress': '#f59e0b',
       voided: '#6b7280',
       deleted: '#ef4444',
-      sent: '#006ECD',
+      sent: '#3378D0',
       declined: '#6b21a8',
-      default: '#0C8BEB'
+      default: '#4894E9'
     };
 
     // Capitalize labels for charts
