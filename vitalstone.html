@@ -25,8 +25,8 @@
 
   <style>
     :root {
-      --primary-green: #9ABA28; /* KPC Green 500 */
-      --secondary-green: #779410; /* KPC Green 600 */
+      --primary-gray: #687A8C; /* Gray-Blue 500 */
+      --secondary-gray: #5F6C7F; /* Gray-Blue 600 */
       --success-green: #196B24;
       --warning-orange: #E97132;
       --danger-red: #ef4444;
@@ -50,9 +50,9 @@
       font-weight: 700;
     }
 
-    /* KPC Green gradient header */
+    /* Gray-Blue gradient header */
     .hero-gradient {
-      background: linear-gradient(135deg, #9ABA28 0%, #779410 100%);
+      background: linear-gradient(135deg, #687A8C 0%, #5F6C7F 100%);
       position: relative;
       overflow: hidden;
     }
@@ -81,9 +81,9 @@
       width: 100%;
     }
 
-    /* KPC Green status card gradient */
+    /* Gray-Blue status card gradient */
     .status-card {
-      background: linear-gradient(135deg, #9ABA28 0%, #779410 100%);
+      background: linear-gradient(135deg, #687A8C 0%, #5F6C7F 100%);
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       transform: translateY(0);
       position: relative;
@@ -107,12 +107,12 @@
 
     .status-card:hover {
       transform: translateY(-8px) scale(1.02);
-      box-shadow: 0 25px 50px -12px rgba(154, 186, 40, 0.4);
+      box-shadow: 0 25px 50px -12px rgba(104, 122, 140, 0.4);
     }
 
-    /* KPC Green button style */
+    /* Gray-Blue button style */
     .btn-primary-custom {
-      background: linear-gradient(135deg, #9ABA28 0%, #779410 100%);
+      background: linear-gradient(135deg, #687A8C 0%, #5F6C7F 100%);
       color: white;
       border: none;
       padding: 10px 20px;
@@ -128,7 +128,7 @@
 
     .btn-primary-custom:hover {
       transform: translateY(-2px);
-      box-shadow: 0 15px 30px rgba(154, 186, 40, 0.4);
+      box-shadow: 0 15px 30px rgba(104, 122, 140, 0.4);
       color: white;
       text-decoration: none;
     }
@@ -144,8 +144,8 @@
 
     .dataTables_wrapper .dataTables_filter input:focus,
     .dataTables_wrapper .dataTables_length select:focus {
-      border-color: var(--primary-green);
-      box-shadow: 0 0 0 4px rgba(154, 186, 40, 0.1);
+      border-color: var(--primary-gray);
+      box-shadow: 0 0 0 4px rgba(104, 122, 140, 0.1);
       outline: none;
     }
   .custom-table select.form-select.form-select-sm {
@@ -227,8 +227,8 @@
     div#dashboard .pagination li a {
       box-shadow: none !important;
       background: transparent;
-      border: 2px solid var(--primary-green) !important;
-      color: var(--primary-green) !important;
+      border: 2px solid var(--primary-gray) !important;
+      color: var(--primary-gray) !important;
       border-radius: 12px;
       margin: 0 4px;
       padding: 10px 16px;
@@ -237,22 +237,22 @@
     }
 
     div#dashboard .pagination li.active a {
-      background: linear-gradient(135deg, #9ABA28 0%, #779410 100%);
-      border: 2px solid var(--primary-green) !important;
+      background: linear-gradient(135deg, #687A8C 0%, #5F6C7F 100%);
+      border: 2px solid var(--primary-gray) !important;
       color: #fff !important;
       transform: scale(1.05);
     }
 
     div#dashboard .pagination li a:hover {
-      background: linear-gradient(135deg, #9ABA28 0%, #779410 100%) !important;
+      background: linear-gradient(135deg, #687A8C 0%, #5F6C7F 100%) !important;
       color: #fff !important;
       transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(154, 186, 40, 0.3);
+      box-shadow: 0 8px 25px rgba(104, 122, 140, 0.3);
     }
 
     /* Enhanced table styling */
     th.sorting, th.sorting_asc, th.sorting_desc {
-      background: linear-gradient(135deg, #9ABA28 0%, #779410 100%) !important;
+      background: linear-gradient(135deg, #687A8C 0%, #5F6C7F 100%) !important;
       color: white !important;
       font-weight: 700 !important;
       padding: 18px 12px !important;
@@ -273,7 +273,7 @@
     }
 
     .table tbody tr:hover {
-      background-color: rgba(154, 186, 40, 0.05);
+      background-color: rgba(104, 122, 140, 0.05);
       transform: scale(1.01);
     }
 
