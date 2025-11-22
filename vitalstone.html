@@ -311,7 +311,7 @@
     }
 
     .status-sent {
-      background: var(--secondary-green);
+      background: var(--secondary-gray);
       color: white;
     }
 
@@ -321,7 +321,7 @@
     }
 
     .status-default {
-      background: var(--primary-green);
+      background: var(--primary-gray);
       color: white;
     }
 
@@ -336,7 +336,7 @@
     }
 
     .chart-title {
-      color: var(--primary-green);
+      color: var(--primary-gray);
       font-weight: 800;
       font-size: 18px;
       margin-bottom: 20px;
@@ -461,7 +461,7 @@
 
       // Handle Vitalstone response structure
       const items = data.envelopes || [];
-      const subFirmColor = data.color || '#9ABA28';
+      const subFirmColor = data.color || '#687A8C';
       const subFirmName = data.subFirm || 'Vitalstone';
 
          items.forEach(item => {
@@ -586,15 +586,15 @@
     });
 
   function initializeCharts(statusCounts) {
-    // KPC color palette
+    // Gray-Blue color palette
     const palette = {
       completed: '#10b981',
       'In Progress': '#f59e0b',
       voided: '#6b7280',
       deleted: '#ef4444',
-      sent: '#779410',
+      sent: '#5F6C7F',
       declined: '#6b21a8',
-      default: '#9ABA28'
+      default: '#687A8C'
     };
 
     // Capitalize labels for charts

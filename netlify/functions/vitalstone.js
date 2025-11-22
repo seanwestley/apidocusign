@@ -14,7 +14,7 @@ let envelopeCache = new Map();
 const VITALSTONE_CONFIG = {
   subFirm: 'Vitalstone',
   searchTerm: 'vitalstone',
-  color: '#9ABA28', // KPC Green 500 from palette
+  color: '#687A8C', // Gray-Blue 500 from palette
   daysBack: 90
 };
 
