@@ -477,7 +477,41 @@
             fetch(`https://docusign-portal.netlify.app/.netlify/functions/fetchfields?id=${envelopeId}`)
               .then(res => res.json())
               .then(tabData => {
-                const investTab = tabData.numberTabs?.find(tab => tab.tabLabel === 'INVEST AMOUNT' && tab.documentId === "1");
+                // Try multiple strategies to find investment amount
+                // Strategy 1: Look for 'INVEST AMOUNT' in any document (not just "1")
+                let investTab = tabData.numberTabs?.find(tab => 
+                  tab.tabLabel?.toUpperCase().includes('INVEST') && 
+                  tab.tabLabel?.toUpperCase().includes('AMOUNT')
+                );
+                
+                // Strategy 2: If not found, check textTabs for amount
+                if (!investTab?.value) {
+                  const textTab = tabData.textTabs?.find(tab => 
+                    tab.tabLabel?.toUpperCase().includes('INVEST') && 
+                    tab.tabLabel?.toUpperCase().includes('AMOUNT')
+                  );
+                  if (textTab?.value) {
+                    return textTab.value;
+                  }
+                }
+                
+                // Strategy 3: Look for any field with "AMOUNT" in the label
+                if (!investTab?.value) {
+                  investTab = tabData.numberTabs?.find(tab => 
+                    tab.tabLabel?.toUpperCase().includes('AMOUNT')
+                  );
+                }
+                
+                // Strategy 4: Check all numberTabs for any value that looks like an amount
+                if (!investTab?.value) {
+                  const allNumberTabs = tabData.numberTabs || [];
+                  investTab = allNumberTabs.find(tab => {
+                    const value = tab.value || '';
+                    // Check if value looks like a currency amount (contains numbers and possibly $ or commas)
+                    return value && /[\d,]+/.test(value) && parseFloat(value.replace(/[$,]/g, '')) > 0;
+                  });
+                }
+                
                 return investTab?.value || '—';
               })
               .catch(() => '—')
